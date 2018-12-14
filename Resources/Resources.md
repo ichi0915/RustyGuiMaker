@@ -13,7 +13,6 @@ The Rusty Gui Maker resources to use
 *   [Vulkan window creation](https://harrylovescode.gitbooks.io/vulkan-api/content/chap04/chap04-windows.html)
 *   [Pure vulkan](https://vulkan-tutorial.com/)
 *   [Pure vulkan 2](https://www.khronos.org/blog/beginners-guide-to-vulkan)
-<br>
 *   [Window, io ](https://github.com/renelindsay/Vulkan-WSIWindow)
 *   [Vulkan Resources](https://github.com/vinjn/awesome-vulkan)
 
