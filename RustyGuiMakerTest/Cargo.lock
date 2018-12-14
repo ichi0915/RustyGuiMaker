@@ -1,0 +1,11 @@
+[[package]]
+name = "RustyGuiMaker"
+version = "0.1.0"
+
+[[package]]
+name = "RustyGuiMakerTest"
+version = "0.1.0"
+dependencies = [
+ "RustyGuiMaker 0.1.0",
+]
+

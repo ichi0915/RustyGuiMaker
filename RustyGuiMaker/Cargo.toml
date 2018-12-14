@@ -1,0 +1,7 @@
+[package]
+name = "RustyGuiMaker"
+version = "0.1.0"
+authors = ["ichi0915 <ichi0915@gmail.com>", "toaxd <toaxdjr@gmail.com>", "panduro <panduro.sergio@outlook.es>"]
+edition = "2018"
+
+[dependencies]
