@@ -6,9 +6,11 @@ fn main() {
 
 	RustyGuiMaker::hello();
 
-	println!( "{}", RustyGuiMaker::VulkanoTest() );
 
-	RustyGuiMaker::CheckPhysicalDevices();
+	println!( "{}", RustyGuiMaker::Test::VulkanoTest() );
+
+
+	RustyGuiMaker::Test::CheckPhysicalDevices();
 }
 
 
