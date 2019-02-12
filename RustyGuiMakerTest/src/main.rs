@@ -5,8 +5,10 @@ extern crate RustyGuiMaker;
 fn main() {
 
 	RustyGuiMaker::hello();
-	
-    println!("Hello, world!");
+
+	println!( "{}", RustyGuiMaker::VulkanoTest() );
+
+	RustyGuiMaker::CheckPhysicalDevices();
 }
 
 

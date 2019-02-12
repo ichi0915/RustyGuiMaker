@@ -5,3 +5,4 @@ authors = ["ichi0915 <ichi0915@gmail.com>", "toaxd <toaxdjr@gmail.com>", "pandur
 edition = "2018"
 
 [dependencies]
+vulkano = "0.11"
