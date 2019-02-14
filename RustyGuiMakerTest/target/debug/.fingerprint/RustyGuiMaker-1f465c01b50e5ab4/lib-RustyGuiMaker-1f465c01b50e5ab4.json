@@ -1,0 +1,1 @@
+{"rustc":9730278545420434237,"features":"[]","target":8239999023667032330,"profile":16083841021600761111,"path":5205521019768319252,"deps":[["vulkano v0.11.1","vulkano",6313611395189176918]],"local":[{"MtimeBased":[[1550112579,221895600],".fingerprint\\RustyGuiMaker-1f465c01b50e5ab4\\dep-lib-RustyGuiMaker-1f465c01b50e5ab4"]}],"rustflags":[],"edition":"Edition2018"}
