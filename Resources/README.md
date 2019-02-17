@@ -14,5 +14,7 @@ The Rusty Gui Maker resources to use
 *   [Pure vulkan](https://vulkan-tutorial.com/)
 *   [Pure vulkan 2](https://www.khronos.org/blog/beginners-guide-to-vulkan)
 *   [Window, io ](https://github.com/renelindsay/Vulkan-WSIWindow)
+*   [Rust in 2019](https://www.ragona.com/posts/learning_rust_2019)
+*   [Lisa intro to rust](https://github.com/vihar/rust-lisa)
 *   [Vulkan Resources](https://github.com/vinjn/awesome-vulkan)
 
