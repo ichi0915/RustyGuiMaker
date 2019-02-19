@@ -18,3 +18,7 @@ The Rusty Gui Maker resources to use
 *   [Lisa intro to rust](https://github.com/vihar/rust-lisa)
 *   [Vulkan Resources](https://github.com/vinjn/awesome-vulkan)
 *   [Awesome Rust](https://github.com/rust-unofficial/awesome-rust)
+
+* [basic text rendering to vulkano windows](https://github.com/rukai/vulkano-text)
+* [Vulkan exmples in rust](https://github.com/bwasty/vulkan-tutorial-rs)
+* [Winit create windows in pure Rust](https://github.com/tomaka/winit)
