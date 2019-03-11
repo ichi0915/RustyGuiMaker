@@ -9,7 +9,7 @@ fn main() {
 
 	RustyGuiMaker::hello();
 
-	let LOL = RustyGuiMaker::RustyInstance();
+	let _LOL = RustyGuiMaker::RustyInstance();
 
 	println!( "{}", RustyGuiMaker::Test::VulkanoTest() );
 

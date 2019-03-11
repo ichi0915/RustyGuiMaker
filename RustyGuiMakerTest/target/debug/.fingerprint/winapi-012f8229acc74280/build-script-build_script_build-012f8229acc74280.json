@@ -1,0 +1,1 @@
+{"rustc":18321205956227587961,"features":"[\"errhandlingapi\", \"handleapi\", \"minwindef\", \"ntsecapi\", \"ntstatus\", \"profileapi\", \"winbase\", \"winerror\", \"winnt\"]","target":4944179213620976468,"profile":11870183705523825133,"path":14749617294086796839,"deps":[],"local":[{"Precalculated":"0.3.6"}],"rustflags":[],"edition":"Edition2015"}
