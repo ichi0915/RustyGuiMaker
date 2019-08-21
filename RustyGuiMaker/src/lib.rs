@@ -27,7 +27,7 @@ pub fn RustyInstance() -> Structs::GuiStruct{
 	//let isntaceCrea: Structs::GuiStruct = Structs::GuiStruct { instance: std::sync::Arc::<Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance")>, x: 0.4 };
 
 	let vulkanInstance: Structs::GuiStruct = Structs::GuiStruct {
-		instance: Arc::try_unwrap(Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance")).unwrap(), 
+		instance: Arc::try_unwrap(Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance")).unwrap(),
 		x: 0.4
 	};
 

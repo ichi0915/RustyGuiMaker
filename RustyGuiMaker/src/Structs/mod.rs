@@ -5,7 +5,7 @@ use vulkano::instance::*;
 //#[derive(Copy, Clone)]
 pub struct GuiStruct{
 	pub instance : Instance,
-    pub x: f32,
+	pub x: f32,
 }
 
 

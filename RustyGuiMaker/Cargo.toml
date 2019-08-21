@@ -2,7 +2,15 @@
 name = "RustyGuiMaker"
 version = "0.1.0"
 authors = ["ichi0915 <ichi0915@gmail.com>", "toaxd <toaxdjr@gmail.com>", "panduro <panduro.sergio@outlook.es>"]
+license = "MPL-2.0"
+repository = "https://github.com/ichi0915/RustyGuiMaker"
+readme = "../README.md"
+keywords = ["vulkan", "graphic", "GUI"]
+documentation = "NA"
 edition = "2018"
 
 [dependencies]
-vulkano = "0.11"
+vulkano-win = "0.12"
+vulkano = "0.12.0"
+winit = "0.19.1"
+image = "0.21.2"

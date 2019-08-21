@@ -1,0 +1,16 @@
+[package]
+name = "RustyGuiMakerExamples"
+version = "0.1.0"
+authors = ["ichi0915 <ichi0915@gmail.com>", "toaxd <toaxdjr@gmail.com>", "panduro <panduro.sergio@outlook.es>"]
+edition = "2018"
+
+[dependencies]
+RustyGuiMaker = { path = "../RustyGuiMaker" }
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3.4", features = ["windef", "winuser"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+metal-rs = "0.10.6"
+cocoa = "0.19"
+objc = "0.2.6"
