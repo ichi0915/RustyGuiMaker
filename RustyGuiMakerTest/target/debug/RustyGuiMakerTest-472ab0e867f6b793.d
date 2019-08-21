@@ -1,1 +1,0 @@
-C:\Users\ichij\Documents\GitHub\RustyGuiMaker\RustyGuiMakerTest\target\debug\RustyGuiMakerTest-472ab0e867f6b793.pdb: C:\Users\ichij\Documents\GitHub\RustyGuiMaker\RustyGuiMaker\src\lib.rs C:\Users\ichij\Documents\GitHub\RustyGuiMaker\RustyGuiMakerTest\src\main.rs
