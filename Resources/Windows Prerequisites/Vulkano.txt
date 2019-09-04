@@ -1,0 +1,13 @@
+https://github.com/vulkano-rs/vulkano
+
+https://steamcommunity.com/app/221410/discussions/6/1742227264188882438/
+
+https://askubuntu.com/questions/1067671/issue-with-vulkan-installation-and-hd-graphics-4000
+
+https://github.com/GameTechDev/IntroductionToVulkan
+
+https://software.intel.com/en-us/search/site/field_tags/vulkan_api-82364/
+
+https://software.intel.com/en-us/articles/api-without-secrets-introduction-to-vulkan-part-3
+
+https://github.com/google/shaderc-rs

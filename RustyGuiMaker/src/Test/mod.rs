@@ -10,7 +10,6 @@
  **
  ** Copyright (c) "2019" Rusty Gui Maker
  **/
-
 //para vulkano y rust
 use vulkano::instance::*;
 use std::sync::Arc;
@@ -30,10 +29,10 @@ use vulkano::device::Features;
 
 
 /*This funtion Creates an instace of Vulkano, if you recieve the "You Are Vulkano Ready" it means you are ready to use RustyGuiMaker, else check vulkano system requirements*/
-pub fn VulkanoTest() -> &'static str{
+/*pub fn VulkanoTest() -> &'static str{
 	let _Test = super::RustyInstance();
 	return "You Are Vulkano Ready";
-}
+}*/
 
 pub fn CheckFamily(){
 	let instance = Instance::new(None, &InstanceExtensions::none(), None).expect("failed to create instance");
@@ -60,7 +59,7 @@ pub fn CheckFamilyWithInstance(instance : Instance){
 
 
 pub trait CheckPhysicalDevices {
-    fn answer(self);
+	fn answer(self);
 }
 pub struct withOutInstance();
 pub struct withInstance(pub Instance);
@@ -93,7 +92,7 @@ impl CheckPhysicalDevices for withInstance {
 }
 
 pub fn overloadable<T: CheckPhysicalDevices> (arg: T) {
-    arg.answer()
+	arg.answer()
 }
 
 
@@ -176,7 +175,6 @@ pub fn WindowCreationResizeTest(){
 		winit::ControlFlow::Continue
 	});
 }
-
 
 
 
