@@ -20,3 +20,7 @@ image = "0.21.1"
 cgmath = "0.17"
 time = "0.1.42"
 
+
+#using vulkano-shaders = "0.13" due to vulkano text
+#vulkano_text = "0.11.0"
+#vulkano-shaders = "0.13"

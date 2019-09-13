@@ -1,58 +1,27 @@
 #![allow(non_snake_case)]
 
 extern crate RustyGuiMaker;
-//use CheckPhysicalDevices::{withOutInstance, withInstance};
 use RustyGuiMaker::*;
 
+use std::path::Path;
 
 fn main() {
 
+	let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../Resources/RGMLogo.png");
 
-	let mut Instance = RustyGuiMaker::CreateDefaultRustyInstance();
-	RustyGuiMaker::UseRustyInstance(Instance);
+	let mut WindowInstance =  Structs::RGMWindow::default();
 
-	/*RustyGuiMaker::hello();
+	WindowInstance.SetWindowTitle(	Some( String::from("Rusty Gui maker") ));
+	WindowInstance.SetWindowIcon(	Some( load_icon(Path::new(path)) ));
+	WindowInstance.SetWidth(		Some( 800.0 )	);
+	WindowInstance.SetHeight(		Some( 600.0 )	);
+	WindowInstance.SetMinWidth(		Some( 400.0 )	);
+	WindowInstance.SetMinHeight(	Some( 200.0 )	);
+	WindowInstance.SetMaxWidth(		Some( 1024.0 )	);
+	WindowInstance.SetMaxHeight(	Some( 768.0 )	);
+	WindowInstance.created_at();
 
-	let mut _LOL = RustyGuiMaker::RustyInstance();
-
-	println!( "{}", RustyGuiMaker::Test::VulkanoTest() );
-
-	RustyGuiMaker::Test::CheckFamily();
-	RustyGuiMaker::Test::CheckFamilyWithInstance( RustyGuiMaker::RustyInstance().instance );
-
-
-	RustyGuiMaker::Test::BufferCreation();
-
-	//RustyGuiMaker::RustyInstance().WIDTH = 1000;
-	//RustyGuiMaker::RustyInstance().HEIGHT = 1000;
-
-	println!();
-
-	println!( "{}", GetWidth( _LOL ));
-	//SetWidth( &mut _LOL, 1000 );
-	//_LOL = SetWidth2( _LOL, 1000 );
-
-	println!();
-
-	println!( "{}", GetWidth( RustyGuiMaker::RustyInstance() ));
-	SetWidth( &mut RustyGuiMaker::RustyInstance(), 1000 );
-	println!( "{}", GetWidth( RustyGuiMaker::RustyInstance() ));
-
-
-	println!( "{}", RustyGuiMaker::RustyInstance().HEIGHT );
-
-
-	//RustyGuiMaker::Test::WindowCreation();
-
-	let mut app =  RustyGuiMaker::Structs::GuiStructApplication::initialize();
-	app.main_loop();
-
-	//intento de overloading
-	//RustyGuiMaker::Test::withOutInstance();
-	//RustyGuiMaker::Test::withInstance( LOL.instance );
-*/
+	RustyGuiMaker::UseRustyInstance(WindowInstance);
 }
 
-//https://github.com/bwasty/vulkan-tutorial-rs
-//https://github.com/rukai/PF_Sandbox
 //https://github.com/rukai/vulkano-text
