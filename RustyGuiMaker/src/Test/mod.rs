@@ -11,6 +11,7 @@
 */
 //para vulkano y rust
 use vulkano::instance::*;
+#[allow(unused)]
 use std::sync::Arc;
 
 //para ventanas

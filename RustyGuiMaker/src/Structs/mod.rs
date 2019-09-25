@@ -69,9 +69,12 @@ use vulkano::command_buffer::{
 use winit::{Icon};
 use time::{Timespec, Tm};
 
+pub mod Vertex;
+
+
 
 #[allow(unused)]
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct RGMWindow {
 
 	pub WindowTitle: Option<String>,
@@ -92,6 +95,7 @@ pub struct RGMWindow {
 
 #[allow(unused)]
 impl RGMWindow {
+	//accesores
 
 	pub fn GetWindowTitle(&self) -> &Option<String> {
 		return &self.WindowTitle;
@@ -164,6 +168,7 @@ impl RGMWindow {
 
 
 #[allow(unused)]
+//#[derive(Clone)]
 pub struct RGMRequirements {
 	pub instance: Arc<Instance>,
 	pub events_loop: EventsLoop,
@@ -224,6 +229,7 @@ impl RGMRequirements {
 
 
 #[allow(unused)]
+//#[derive(Clone)]
 pub struct RGMinstance {
 	pub Window: RGMWindow,
 	pub Requirements: RGMRequirements
