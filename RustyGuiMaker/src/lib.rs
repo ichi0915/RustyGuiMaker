@@ -43,6 +43,8 @@ use std::path::Path;
 //min max sizes
 use winit::dpi::LogicalSize;
 use std::sync::Arc;
+use std::rc::Rc;
+
 
 use std::borrow::BorrowMut; //.borrow_mut();
 
@@ -53,21 +55,11 @@ pub mod Structs;
 
 
 
-
-
-
-
-
+//ObjectPicker
 use vulkano::format::Format;
 use vulkano::image::attachment::AttachmentImage;
 use vulkano::image::ImageUsage;
 use std::iter;
-
-
-
-
-
-
 
 
 
@@ -161,12 +153,13 @@ impl ObjectPicker {
 		.expect("Failed to create buffer");
 
 		//
-		let vs = pick_vs::Shader::load(queue.device().clone()).unwrap();
-		let fs = pick_fs::Shader::load(queue.device().clone()).unwrap();
+		let vs = Structs::Shaders::pick_vs::Shader::load(queue.device().clone()).unwrap();
+		let fs = Structs::Shaders::pick_fs::Shader::load(queue.device().clone()).unwrap();
 
 		let pipeline = Arc::new(
 			GraphicsPipeline::start()
-				.vertex_input_single_buffer::<Vertex>()
+				//.vertex_input_single_buffer::<Vertex>()
+				.vertex_input_single_buffer::<Structs::Vertex::VertexBase>()
 				.vertex_shader(vs.main_entry_point(), ())
 				.triangle_list()
 				.viewports_dynamic_scissors_irrelevant(1)
@@ -193,8 +186,8 @@ impl ObjectPicker {
 		}
 	}
 
-	fn create_pushconstants(id: usize) -> pick_vs::ty::PushConstants {
-		pick_vs::ty::PushConstants {
+	fn create_pushconstants(id: usize) -> Structs::Shaders::pick_vs::ty::PushConstants {
+		Structs::Shaders::pick_vs::ty::PushConstants {
 			color: [
 				((id & 0xFF) as f32) / 255.0,
 				((id >> 8) & 0xFF) as f32 / 255.0,
@@ -214,7 +207,8 @@ impl ObjectPicker {
 	}
 
 	/// Return either ID of picked object or None if did not click on anything
-	pub fn pick_object( &mut self, x: usize, y: usize, objects: &Vec<Arc<CpuAccessibleBuffer<[Vertex]>>>, ) -> Option<usize> {
+	//pub fn pick_object( &mut self, x: usize, y: usize, objects: &Vec<Arc<CpuAccessibleBuffer<[Vertex]>>>, ) -> Option<usize> {
+	pub fn pick_object( &mut self, x: usize, y: usize, objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>, ) -> Option<usize> {
 		let clear_values = vec![[0.0, 0.0, 0.0, 0.0].into(), 1f32.into()];
 
 		let mut command_buffer_builder = AutoCommandBufferBuilder::primary_one_time_submit(
@@ -282,6 +276,7 @@ impl ObjectPicker {
 
 
 
+//Errores Se muere cuando se minimiza
 
 
 
@@ -356,91 +351,25 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 
 
-	//let objects = vec![vertex_Quad, vertex_buffer_3];
 
+	//let yolo = Structs::Vertex::vertex_Quad2::initialize( device.clone() );
+	let Rect = Structs::Vertex::Rectangulo::initialize( device.clone(), 0.1, 0.0, 0.0);
+	let Trian = Structs::Vertex::TrianguloEquilatero::initialize( device.clone(), 0.1, 0.5, 0.0);
 
-	//let yolo = Structs::Vertex::Vertex::initialize( device.clone());
+	let Linea = Structs::Vertex::Linea::initialize( device.clone(), 5, 0.1, 0.0, 0.5);
 
+	//inicializo mi objeto con el triangulo y el cuadrado
+	let mut objects = vec![ /*yolo.Vert.clone(),*/ Rect.Vert.clone(), Trian.Vert.clone()];
 
-
-
-	// MY THREE OBJECTS.
-    // a triangle
-	//este va a morir cuando se haga el triangulko rectangulo y el isoceles
-    let vertex_buffer = {
-        CpuAccessibleBuffer::from_iter(
-            device.clone(),
-            BufferUsage::all(),
-            [
-                Vertex {
-                    position: [-1.0, -0.25, 0.0],
-                    color: [0.0, 0.0, 1.0],
-                },
-                Vertex {
-                    position: [0.0, 0.5, 0.0],
-                    color: [0.0, 0.0, 1.0],
-                },
-                Vertex {
-                    position: [0.25, -0.1, 0.2],
-                    color: [0.0, 0.0, 1.0],
-                },
-            ]
-            .iter()
-            .cloned(),
-        )
-        .unwrap()
-    };
+	//luego le pego mi linea al objeto
+	for i in Linea.VertArray.iter() {
+		objects.push( i.clone() );
+	}
 
 
 
-
-
-	let mut Multiplier = 0.1;
-	let mut XMovement = 0.0;
-	let mut YMovement = 0.0;
-
-
-	let Rectangulo = {
-		CpuAccessibleBuffer::from_iter(
-			device.clone(),
-			BufferUsage::all(),
-			[
-				Vertex { position: [-1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				Vertex { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				Vertex { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-
-				Vertex { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				Vertex { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				Vertex { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], }
-			]
-			.iter()
-			.cloned(),
-		)
-		.unwrap()
-	};
-
-	Multiplier = 0.5;
-	//XMovement = 0.5;
-	//YMovement = 0.5;
-
-	let TrianguloEquilatero = {
-		CpuAccessibleBuffer::from_iter(
-			device.clone(),
-			BufferUsage::all(),
-			[
-				Vertex { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], },
-				Vertex { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], },
-				Vertex { position: [ 0.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], }
-			]
-			.iter()
-			.cloned(),
-		)
-		.unwrap()
-	};
-
-	let objects = vec![vertex_buffer, Rectangulo, TrianguloEquilatero];
-	let vs = vs::Shader::load(device.clone()).unwrap();
-	let fs = fs::Shader::load(device.clone()).unwrap();
+	let vs = Structs::Shaders::vs::Shader::load(device.clone()).unwrap();
+	let fs = Structs::Shaders::fs::Shader::load(device.clone()).unwrap();
 	//let vs = Structs::vs::Shader::load(device.clone()).unwrap();
 	//let fs = Structs::fs::Shader::load(device.clone()).unwrap();
 
@@ -593,12 +522,12 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 			let pc = {
 				if let Some(selected_idx) = selected_entity {
 					if selected_idx == i {
-						fs::ty::PushConstants { isSelected: 1 }
+						Structs::Shaders::fs::ty::PushConstants { isSelected: 1 }
 					} else {
-						fs::ty::PushConstants { isSelected: 0 }
+						Structs::Shaders::fs::ty::PushConstants { isSelected: 0 }
 					}
 				} else {
-					fs::ty::PushConstants { isSelected: 0 }
+					Structs::Shaders::fs::ty::PushConstants { isSelected: 0 }
 				}
 			};
 			command_buffer_builder = command_buffer_builder
@@ -823,92 +752,4 @@ pub fn load_icon(path: &Path) -> Icon {
 		(rgba, width, height)
 	};
 	Icon::from_rgba(icon_rgba, icon_width, icon_height).expect("Failed to open icon")
-}
-
-
-
-
-
-
-
-
-
-
-// The next step is to create the shaders.
-mod vs {
-	vulkano_shaders::shader! {
-		ty: "vertex",
-			src: "
-		#version 450
-
-		layout(location = 0) in vec3 position;
-		layout(location = 1) in vec3 color;
-		layout(location = 0) out vec3 frag_color;
-
-		void main() {
-			gl_Position = vec4(position, 1.0);
-			frag_color = color;
-		}"
-	}
-}
-
-mod fs {
-	vulkano_shaders::shader! {
-		ty: "fragment",
-			src: "
-		#version 450
-
-		layout(location = 0) in vec3 frag_color;
-		layout(location = 0) out vec4 f_color;
-
-		layout (push_constant) uniform PushConstants {
-			int isSelected;
-		} pushConstants;
-
-		void main() {
-			if (pushConstants.isSelected == 0) {
-				f_color = vec4(frag_color, 1.0);
-			} else {
-				f_color = vec4(1.0, 1.0, 1.0, 1.0);
-			}
-		}
-		"
-	}
-}
-
-mod pick_vs {
-	vulkano_shaders::shader! {
-		ty: "vertex",
-			src: "
-		#version 450
-
-		layout(location = 0) in vec3 position;
-		layout(location = 1) in vec3 color;
-		layout(location = 0) out vec4 frag_color;
-
-		layout (push_constant) uniform PushConstants {
-			vec4 color;
-		} pushConstants;
-
-		void main() {
-			gl_Position = vec4(position, 1.0);
-			frag_color = pushConstants.color;
-		}"
-	}
-}
-
-mod pick_fs {
-	vulkano_shaders::shader! {
-		ty: "fragment",
-			src: "
-		#version 450
-
-		layout(location = 0) in vec4 frag_color;
-		layout(location = 0) out vec4 f_color;
-
-		void main() {
-			f_color = frag_color;
-		}
-		"
-	}
 }
