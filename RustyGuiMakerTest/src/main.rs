@@ -21,6 +21,10 @@ fn main() {
 	WindowInstance.SetMaxHeight(	Some( 768.0 )	);
 	WindowInstance.created_at();
 
+	//let mut Figure = String::from("");
+
+	// let mut Figures = Structs::Vertex::Figures::addFigure();
+
 	RustyGuiMaker::UseRustyInstance(WindowInstance);
 }
 

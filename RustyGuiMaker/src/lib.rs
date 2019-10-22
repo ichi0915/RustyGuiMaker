@@ -207,7 +207,6 @@ impl ObjectPicker {
 	}
 
 	/// Return either ID of picked object or None if did not click on anything
-	//pub fn pick_object( &mut self, x: usize, y: usize, objects: &Vec<Arc<CpuAccessibleBuffer<[Vertex]>>>, ) -> Option<usize> {
 	pub fn pick_object( &mut self, x: usize, y: usize, objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>, ) -> Option<usize> {
 		let clear_values = vec![[0.0, 0.0, 0.0, 0.0].into(), 1f32.into()];
 
@@ -275,12 +274,72 @@ impl ObjectPicker {
 
 
 
+//https://stackoverflow.com/questions/41081240/idiomatic-callbacks-in-rust
+
+
+// //simple callback
+// type Callback = fn();
+
+// struct Processor {
+//     callback: Callback,
+// }
+
+// impl Processor {
+//     fn set_callback(&mut self, c: Callback) {
+//         self.callback = c;
+//     }
+
+//     fn process_events(&self) {
+//         (self.callback)();
+//     }
+// }
+
+// fn callback() {
+//     println!("Funcion callback!");
+// }
+// // simple callback
+
+
+
+
+struct Processor<CB> where CB: FnMut() {
+    callback: CB,
+}
+
+impl<CB> Processor<CB> where CB: FnMut() {
+    fn set_callback(&mut self, c: CB) {
+        self.callback = c;
+    }
+
+    fn process_events(&mut self) {
+        (self.callback)();
+    }
+}
+
+
+
+
+
 
 //Errores Se muere cuando se minimiza
 
 
 
 pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
+
+	//simple callback
+	// let mut p = Processor { callback: callback };
+	//simple callback
+
+
+	let s = "world!".to_string();
+	// let callback = || println!("hello {}", s);
+	let callback = || {println!("hello {}", s); println!("hello {}", s); };
+    let mut p = Processor { callback: callback };
+
+
+
+
 
 	let mut vulkanInstance = Structs::RGMinstance::initializeWithWindowStruct(WindowStruct);
 	//let window = &vulkanInstance.Requirements.surface.window(); //tambien jala
@@ -352,17 +411,31 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 
 
-	//let yolo = Structs::Vertex::vertex_Quad2::initialize( device.clone() );
-	let Rect = Structs::Vertex::Rectangulo::initialize( device.clone(), 0.1, 0.0, 0.0);
-	let Trian = Structs::Vertex::TrianguloEquilatero::initialize( device.clone(), 0.1, 0.5, 0.0);
+	// //asi se declaraban originalmente pero ahora nel
+	// //let yolo = Structs::Vertex::vertex_Quad2::initialize( device.clone() );
+	// let Rect = Structs::Vertex::Rectangulo::initialize( device.clone(), 0.1, 0.0, 0.0);
+	// let Trian = Structs::Vertex::TrianguloEquilatero::initialize( device.clone(), 0.1, 0.5, 0.0);
 
-	let Linea = Structs::Vertex::Linea::initialize( device.clone(), 5, 0.1, 0.0, 0.5);
+	// let Linea = Structs::Vertex::Linea::initialize( device.clone(), 5, 0.1, 0.0, 0.5);
+	// let Linea2 = Structs::Vertex::Linea::initialize( device.clone(), 5, 0.1, 0.0, -0.5);
+	// // inicializo mi objeto con el triangulo y el cuadrado
+	// let  objects = vec![ /*yolo.Vert.clone(),*/ Rect.Vert.clone(), Trian.Vert.clone()];
+	// let mut objects2 = vec![ Linea, Linea2 ];
+	// // //luego le pego mi linea al objeto
+	// // for i in Linea.VertArray.iter() {
+	// // 	objects.push( i.clone() );
+	// // }
+	// //asi se declaraban originalmente pero ahora nel
 
-	//inicializo mi objeto con el triangulo y el cuadrado
-	let mut objects = vec![ /*yolo.Vert.clone(),*/ Rect.Vert.clone(), Trian.Vert.clone()];
+	let mut CanvasFigures = Structs::Vertex::CanvasFigures::createCanvasFigures();
 
-	//luego le pego mi linea al objeto
-	for i in Linea.VertArray.iter() {
+	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0);
+	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0);
+
+	let mut objects = vec![ ];
+
+	// luego le pego mi linea al objeto
+	for i in CanvasFigures.VertArray.iter() {
 		objects.push( i.clone() );
 	}
 
@@ -370,9 +443,6 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 	let vs = Structs::Shaders::vs::Shader::load(device.clone()).unwrap();
 	let fs = Structs::Shaders::fs::Shader::load(device.clone()).unwrap();
-	//let vs = Structs::vs::Shader::load(device.clone()).unwrap();
-	//let fs = Structs::fs::Shader::load(device.clone()).unwrap();
-
 
 	let render_pass = Arc::new(vulkano::single_pass_renderpass!(
 		device.clone(),
@@ -433,6 +503,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 	let mut mouse_x = 0.0;
 	let mut mouse_y = 0.0;
 	let mut selected_entity = None;
+	let mut clicked_entity = None;
 
 
 
@@ -520,20 +591,34 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 		for (i, obj) in objects.iter().enumerate() {
 			let pc = {
+
+				if let Some(clicked_idx) = clicked_entity {
+					if clicked_idx == i {
+						println!("Le picaste a {}", clicked_idx);
+						p.process_events();
+						clicked_entity = None;
+					} else {
+					}
+				} else{
+				}
+
+
 				if let Some(selected_idx) = selected_entity {
 					if selected_idx == i {
-						Structs::Shaders::fs::ty::PushConstants { isSelected: 1 }
+						// println!("Le picaste a {}", selected_idx);
+						Structs::Shaders::fs::ty::PushConstants { isSelected: 1, Clicked: 1 }
 					} else {
-						Structs::Shaders::fs::ty::PushConstants { isSelected: 0 }
+						Structs::Shaders::fs::ty::PushConstants { isSelected: 0, Clicked: 0 }
 					}
 				} else {
-					Structs::Shaders::fs::ty::PushConstants { isSelected: 0 }
+					Structs::Shaders::fs::ty::PushConstants { isSelected: 0, Clicked: 0 }
 				}
 			};
 			command_buffer_builder = command_buffer_builder
 				.draw(pipeline.clone(), &dynamic_state, obj.clone(), (), pc)
 				.unwrap();
 		}
+
 
 		// Finish building the command buffer by calling `build`.
 		let command_buffer = command_buffer_builder.end_render_pass().unwrap().build().unwrap();
@@ -611,9 +696,9 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 				//LogicalPosition { x: 978.0, y: 139.0 }
 				//Event::WindowEvent { event: WindowEvent::ReceivedCharacter('w') , .. } => {
 				Event::WindowEvent { event: WindowEvent::CursorMoved { position, .. }, .. } => {
-					println!("CursorMoved");
-					println!("Eventos: \"{:?}\"", event);
-					println!("CursorMoved");
+					// println!("CursorMoved");
+					// println!("Eventos: \"{:?}\"", event);
+					// println!("CursorMoved");
 
 					mouse_x = position.x;
 					mouse_y = position.y;
@@ -632,6 +717,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 					let x = (mouse_x * hidpi_factor).round() as usize;
 					let y = (mouse_y * hidpi_factor).round() as usize;
 					selected_entity = object_picker.pick_object(x, y, &objects);
+					clicked_entity  = object_picker.pick_object(x, y, &objects);
 				},
 
 

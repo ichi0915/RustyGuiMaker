@@ -304,6 +304,150 @@ impl TrianguloEquilatero {
 }
 
 
+pub enum Figures {
+	// Line,
+	Plane,
+	// Circle,
+	Triangle
+}
+impl Figures {
+	pub fn as_str(&self) -> &'static str {
+		match *self {
+			// Figures::Line => "Line",
+			Figures::Plane => "Plane",
+			// Figures::Circle => "Circle",
+			Figures::Triangle => "Triangle"
+		}
+	}
+	// pub fn as_struct(&self) -> struct {
+	// 	match *self {
+	// 		Figures::Line => "Line",
+	// 		Figures::Plane => "Plane",
+	// 		Figures::Circle => "Circle",
+	// 		Figures::Triangle => "Triangle"
+	// 	}
+	// }
+}
+
+
+
+#[allow(unused)]
+pub struct CanvasFigures {
+	pub VertArray: Vec< std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>>,
+	pub callback: Vec<Option<String>>
+}
+
+
+#[allow(unused)]
+impl CanvasFigures {
+
+	pub fn createCanvasFigures() -> Self{
+		let mut VertArray = Vec::new();
+		let mut callback = Vec::new();
+
+		let mut this = Self {
+			VertArray,
+			callback,
+		};
+		this
+	}
+
+	pub fn addFigureDefault( CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device> ) -> Self{
+
+		// let mut VertArray = Vec::new();
+		let mut VertArray = CanvasFig.VertArray;
+
+
+
+
+		let mut callback = Vec::new();
+
+
+
+
+		// let Vertex = match Fig {
+		// 	// Figures::Line => Linea::initialize(deviceTmp: Arc<Device>, Size: i8, Multiplier: f32, XMovement: f32, YMovement: f32),
+		// 	Figures::Line => "asd",
+		// 	Figures::Plane => Rectangulo::initializeDefault(deviceTmp.clone()),
+		// 	Figures::Circle => "Circle",
+		// 	Figures::Triangle => TrianguloEquilatero::initializeDefault(deviceTmp.clone())
+		// };
+
+		let Figstr = Figures::as_str(&Fig);
+		let NewVertex : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>;
+
+		if(Figstr == "Plane" ){
+			NewVertex = Rectangulo::initializeDefault(deviceTmp.clone()).Vert.clone();
+		}
+		else if(Figstr == "Triangle" ){
+			NewVertex = TrianguloEquilatero::initializeDefault(deviceTmp.clone()).Vert.clone();
+		}
+		else{
+			NewVertex = Rectangulo::initializeDefault(deviceTmp.clone()).Vert.clone();
+		}
+
+		VertArray.push( NewVertex );
+
+		let mut this = Self {
+			VertArray,
+			callback,
+		};
+		this
+	}
+
+
+	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32 ) -> Self {
+
+		//let mut VertArray = Vec::new();
+		let mut VertArray = CanvasFig.VertArray;
+
+
+
+
+		let mut callback = Vec::new();
+
+
+
+
+		let Figstr = Figures::as_str(&Fig);
+		let NewVertex : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>;
+
+		if(Figstr == "Plane" ){
+			NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+		}
+		else if(Figstr == "Triangle" ){
+			NewVertex = TrianguloEquilatero::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+		}
+		else{
+			NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+		}
+
+		VertArray.push( NewVertex );
+
+		let mut this = Self {
+			VertArray,
+			callback,
+		};
+		this
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #[allow(unused)]
 pub struct Linea {
 	//pub Vert : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>,
