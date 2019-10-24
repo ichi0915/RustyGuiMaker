@@ -27,10 +27,9 @@ use vulkano::sync;
 use vulkano_win::VkSurfaceBuild;
 #[allow(unused)]
 use winit::{EventsLoop, Window, WindowBuilder, Event, WindowEvent, Icon, KeyboardInput, ElementState, MouseCursor, MouseButton };
-#[allow(unused)]
-use std::thread;
-#[allow(unused)]
-use std::time::Duration;
+
+// use std::thread;
+// use std::time::Duration;
 
 // IMPORT
 //use vulkano_text::{DrawText, DrawTextTrait};
@@ -43,10 +42,10 @@ use std::path::Path;
 //min max sizes
 use winit::dpi::LogicalSize;
 use std::sync::Arc;
-use std::rc::Rc;
+// use std::rc::Rc;
 
 
-use std::borrow::BorrowMut; //.borrow_mut();
+// use std::borrow::BorrowMut; //.borrow_mut();
 
 //for the Rusty Gui Maker Structs
 pub mod Test;
@@ -206,6 +205,90 @@ impl ObjectPicker {
 		}
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/// Return either ID of picked object or None if did not click on anything
+	pub fn pick_objectCanvasFigure( &mut self, x: usize, y: usize, CanvasFigures: &Structs::Vertex::CanvasFigures, ) -> Option<usize> {
+		let clear_values = vec![[0.0, 0.0, 0.0, 0.0].into(), 1f32.into()];
+
+		let mut command_buffer_builder = AutoCommandBufferBuilder::primary_one_time_submit(
+			self.queue.device().clone(),
+			self.queue.family(),
+		)
+		.unwrap()
+		.begin_render_pass(self.framebuffer.clone(), false, clear_values)
+		.unwrap();
+
+
+		for (id, object) in CanvasFigures.VertArray.iter().enumerate() {
+			// Now, render all objects and use the ID as push constant.
+				let push_constant = ObjectPicker::create_pushconstants(id);
+				command_buffer_builder = command_buffer_builder
+					.draw(
+						self.pipeline.clone(),
+						&DynamicState::none(),
+						vec![object.clone()],
+						(),
+						push_constant,
+					)
+					.unwrap();
+		}
+
+		command_buffer_builder = command_buffer_builder.end_render_pass().unwrap();
+
+		// Now copy the image to the CPU accessible buffer.
+		command_buffer_builder = command_buffer_builder
+			.copy_image_to_buffer(self.image.clone(), self.buf.clone())
+			.unwrap();
+
+		let command_buffer = command_buffer_builder.build().unwrap();
+
+		// Execute command buffer and wait for it to finish.
+		command_buffer
+			.execute(self.queue.clone())
+			.unwrap()
+			.then_signal_fence_and_flush()
+			.unwrap()
+			.wait(None)
+			.unwrap();
+
+		// ok, at this point the image is in the buffer. We can access it as it is
+		// a CPU accessible buffer.
+		let buffer_content = self.buf.read().unwrap();
+
+		// Each pixel of the image is represented by a rgba 8-bit value. So to get
+		// the index in the vector, we need to multiply by 4.
+		let buf_pos = 4 * (y * (self.dimensions[0] as usize) + x);
+
+		let entity_id = ObjectPicker::get_entity_id(
+			buffer_content[buf_pos],
+			buffer_content[buf_pos + 1],
+			buffer_content[buf_pos + 2],
+			buffer_content[buf_pos + 3],
+		);
+		entity_id
+	}
+
+
+
+
+
+
+
+
+
+	#[allow(unused)]
 	/// Return either ID of picked object or None if did not click on anything
 	pub fn pick_object( &mut self, x: usize, y: usize, objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>, ) -> Option<usize> {
 		let clear_values = vec![[0.0, 0.0, 0.0, 0.0].into(), 1f32.into()];
@@ -271,252 +354,8 @@ impl ObjectPicker {
 
 
 
-pub fn DinamicAddFigures( objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>,
-						 objectsToAdd: &Structs::Vertex::CanvasFigures) ->
-						Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>> {
-						// NewObjects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>){
-
-	let mut NewObjects = vec![ ];
-
-	//los originales
-	for i in objects.iter() {
-		NewObjects.push( i.clone() );
-	}
-	//los nuevos
-	for i in objectsToAdd.VertArray.iter() {
-		NewObjects.push( i.clone() );
-	}
-
-	return NewObjects;
-}
-
-pub fn DinamicAddFigure( objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>,
-						objectToAdd: &Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>) ->
-						Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>{
-	// objects.pu
-	let mut NewObjects = vec![ ];
-
-	//los originales
-	for i in objects.iter() {
-		NewObjects.push( i.clone() );
-	}
-
-	NewObjects.push( objectToAdd.clone() );
-
-	return NewObjects;
-}
-
-
-
-
-pub fn DinamicDelFigure( objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>,
-						 idDel: usize) ->
-						Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>> {
-
-	let mut NewObjects = vec![ ];
-
-	for (id, object) in objects.iter().enumerate(){
-		if idDel != id {
-			NewObjects.push( object.clone() );
-		}
-	}
-
-	return NewObjects;
-}
-
-
-
-
-
-// pub fn DinamicDelFigures( objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>,
-// 						 objectsToDel: &Structs::Vertex::CanvasFigures) ->
-// 						Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>> {
-
-// 	let mut NewObjects = vec![ ];
-
-// 	for (id, object) in objects.iter().enumerate(){
-// 		for (idDel, objectDel) in objectsToDel.VertArray.iter().enumerate(){
-// 			if idDel != id  {
-// 				NewObjects.push( object.clone() );
-// 			}
-// 		}
-// 	}
-
-// 	return NewObjects;
-// }
-
-
-
-
-
-
-
-//https://stackoverflow.com/questions/41081240/idiomatic-callbacks-in-rust
-
-
-// //simple callback
-// type Callback = fn();
-
-// struct Processor {
-//     callback: Callback,
-// }
-
-// impl Processor {
-//     fn set_callback(&mut self, c: Callback) {
-//         self.callback = c;
-//     }
-
-//     fn process_events(&self) {
-//         (self.callback)();
-//     }
-// }
-
-// fn callback() {
-//     println!("Funcion callback!");
-// }
-// // simple callback
-
-
-#[derive(Debug, Clone)]
-pub enum CallbackEmun {
-	ADD,
-	DEL,
-	MOD,
-	CSM
-}
-impl CallbackEmun {
-	pub fn as_str(&self) -> &'static str {
-		match *self {
-			CallbackEmun::ADD => "ADD",
-			CallbackEmun::DEL => "DEL",
-			CallbackEmun::MOD => "MOD",
-			CallbackEmun::CSM => "CSM"
-		}
-	}
-
-}
-
-#[derive(Debug, Clone)]
-struct Processor<CB> where CB: FnMut() {
-	callback: CB,
-	callbackQueue: Vec<Option<CallbackEmun>>
-	// callbackQueue: Option<Vec<CallbackEmun>>
-}
-
-#[allow(unused_parens)]
-impl<CB> Processor<CB> where CB: FnMut() {
-	fn set_callback(&mut self, c: CB) {
-		self.callback = c;
-	}
-
-	fn process_events(&mut self, funcion: CallbackEmun) {
-
-		let funcionstr = CallbackEmun::as_str(&funcion);
-
-		if(funcionstr == "ADD" ){
-			self.AddFigToVec();
-		}
-		else if(funcionstr == "DEL" ){
-			self.DelFigToVec();
-		}
-		else if(funcionstr == "MOD" ){
-			self.ModFigToVec();
-		}
-		else if(funcionstr == "CSM" ){
-			self.CsmFigToVec();
-		}
-		else{
-			//Imposible
-			println!("Funcion no reconocida");
-			(self.callback)();
-		}
-	}
-
-	fn AddFigToVec(&mut self) {
-		let mut stack = self.callbackQueue.clone();
-		stack.push( Some(CallbackEmun::ADD) );
-
-		self.callbackQueue = stack;
-		println!("ADD",);
-	}
-
-	fn DelFigToVec(&mut self) {
-		let mut stack = self.callbackQueue.clone();
-		stack.push( Some(CallbackEmun::DEL) );
-
-		self.callbackQueue = stack;
-		println!("DEL",);
-	}
-
-	fn ModFigToVec(&mut self) {
-		println!("MOD",);
-	}
-
-	fn CsmFigToVec(&mut self) {
-		println!("CSM",);
-	}
-
-	fn GetQueue(&mut self) -> Vec<Option<CallbackEmun>> {
-		return self.callbackQueue.clone();
-	}
-
-	fn PrintQueue(&mut self) {
-		for d in &mut self.callbackQueue.clone() {
-			if let Some(ref mut du) = *d {
-				//Sin some
-				println!(" Print:  {:?}", du);
-			}
-			//Con some
-			// println!(" Print:  {:?}", d);
-		}
-	}
-
-	fn CleanQueue(&mut self)  {
-		self.callbackQueue = Vec::new( );
-	}
-
-	// fn DoQueue(&mut self) -> {
-	// 	for d in &mut self.callbackQueue.clone() {
-	// 		if let Some(ref mut du) = *d {
-	// 			println!(" Realizando: {:?}", du);
-
-	// 			let funcionstr = CallbackEmun::as_str(&du);
-	// 			if(funcionstr == "ADD" ){
-	// 				println!("ADD");
-	// 			}
-	// 			if(funcionstr == "DEL" ){
-	// 				self.DelFigToVec();
-	// 				println!("DEL");
-	// 			}
-	// 			if(funcionstr == "MOD" ){
-	// 				println!("MOD");
-	// 				self.ModFigToVec();
-	// 			}
-	// 			if(funcionstr == "CSM" ){
-	// 				println!("CSTM");
-	// 				self.CsmFigToVec();
-	// 			}
-	// 			else{
-	// 				println!("Funcion no reconocida");
-	// 			}
-
-
-	// 		}
-	// 	}
-	// 	self.callbackQueue.pop();
-	// }
-
-}
-
-
-
 //Errores Se muere cuando se minimiza
 pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
-
-	//simple callback
-	// let mut p = Processor { callback: callback };
-	//simple callback
-
 
 	let s = "world!".to_string();
 	// let callback = || println!("hello {}", s);
@@ -525,7 +364,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 		println!("hello {}", s);
 	};
 
-	let mut p = Processor {
+	let mut p = Structs::Callbacks::Processor {
 		callback: callback,
 		callbackQueue: Vec::new( ),
 		// callbackQueue: Some( Vec::new() ),
@@ -602,36 +441,10 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 	};
 
 
-
-
-	// //asi se declaraban originalmente pero ahora nel
-	// //let yolo = Structs::Vertex::vertex_Quad2::initialize( device.clone() );
-	// let Rect = Structs::Vertex::Rectangulo::initialize( device.clone(), 0.1, 0.0, 0.0);
-	// let Trian = Structs::Vertex::TrianguloEquilatero::initialize( device.clone(), 0.1, 0.5, 0.0);
-
-	// let Linea = Structs::Vertex::Linea::initialize( device.clone(), 5, 0.1, 0.0, 0.5);
-	// let Linea2 = Structs::Vertex::Linea::initialize( device.clone(), 5, 0.1, 0.0, -0.5);
-	// // inicializo mi objeto con el triangulo y el cuadrado
-	// let  objects = vec![ /*yolo.Vert.clone(),*/ Rect.Vert.clone(), Trian.Vert.clone()];
-	// let mut objects2 = vec![ Linea, Linea2 ];
-	// // //luego le pego mi linea al objeto
-	// // for i in Linea.VertArray.iter() {
-	// // 	objects.push( i.clone() );
-	// // }
-	// //asi se declaraban originalmente pero ahora nel
-
 	let mut CanvasFigures = Structs::Vertex::CanvasFigures::createCanvasFigures();
 
-	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0, String::from("ADD"));
-	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0, String::from("DEL"));
-
-	let mut objects = vec![ ];
-
-	// luego le pego mi linea al objeto
-	for i in CanvasFigures.VertArray.iter() {
-		objects.push( i.clone() );
-	}
-
+	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0, Structs::Callbacks::CallbackEmun::ADD);
+	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0, Structs::Callbacks::CallbackEmun::DEL);
 
 
 	let vs = Structs::Shaders::vs::Shader::load(device.clone()).unwrap();
@@ -782,7 +595,8 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 			.build().unwrap();
 		*/
 
-		for (i, obj) in objects.iter().enumerate() {
+		for (i, obj) in CanvasFigures.VertArray.iter().enumerate() {
+		// for (i, obj) in objects.iter().enumerate() {
 			let pc = {
 
 				if let Some(clicked_idx) = clicked_entity {
@@ -790,10 +604,14 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 						println!("Le picaste a {}", clicked_idx);
 
 						if clicked_idx == 0{
-							p.process_events( CallbackEmun::ADD );
+							println!("00000000000000000 {:?}", CanvasFigures.callback[clicked_idx]);
+							// let lol =  CanvasFigures.callback[clicked_idx].clone();
+							// p.process_events( CanvasFigures.callback[clicked_idx].clone() );
+							p.process_events( Structs::Callbacks::CallbackEmun::ADD );
 						}
 						else if clicked_idx == 1{
-							p.process_events( CallbackEmun::DEL );
+							println!("1111111111111111 {:?}", CanvasFigures.callback[clicked_idx]);
+							p.process_events( Structs::Callbacks::CallbackEmun::DEL );
 						}
 
 						clicked_entity = None;
@@ -823,29 +641,24 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 		let Queue = p.GetQueue();
 
-		// for d in &mut Queue.clone() {
-		// 	if let Some(ref mut du) = *d {
-		// 		//Sin some
-		// 		println!(" Print:  {:?}", du);
-		// 	}
-		// }
-
 		for d in &mut Queue.clone() {
 			if let Some(ref mut du) = *d {
 				println!(" Realizando: {:?}", du);
 
-				let funcionstr = CallbackEmun::as_str(&du.clone());
+				let funcionstr = Structs::Callbacks::CallbackEmun::as_str(&du.clone());
 
 				if funcionstr == "ADD" {
-					let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
+					println!("ADD");
 
-					CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, String::from("ADD"));
+					CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, Structs::Callbacks::CallbackEmun::ADD);
+
+					// let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
 					// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));
-
-					objects = DinamicAddFigures(&objects.clone(), &CanvasFiguresADD );
+					// objects = DinamicAddFigures(&objects.clone(), &CanvasFiguresADD );
 				}
 				else if funcionstr == "DEL" {
-					objects = DinamicDelFigure(&objects.clone(), 2 );
+					CanvasFigures = Structs::Vertex::CanvasFigures::delFigure( CanvasFigures, 2);
+					//objects = DinamicDelFigure(&objects.clone(), 2 );
 				}
 				else if funcionstr == "MOD" {
 					println!("MOD");
@@ -959,8 +772,11 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 					let hidpi_factor = VulkanoSurfaceClone.window().get_hidpi_factor();
 					let x = (mouse_x * hidpi_factor).round() as usize;
 					let y = (mouse_y * hidpi_factor).round() as usize;
-					selected_entity = object_picker.pick_object(x, y, &objects);
-					clicked_entity  = object_picker.pick_object(x, y, &objects);
+					// selected_entity = object_picker.pick_object(x, y, &objects);
+					// clicked_entity  = object_picker.pick_object(x, y, &objects);
+
+					selected_entity = object_picker.pick_objectCanvasFigure(x, y, &CanvasFigures);
+					clicked_entity  = object_picker.pick_objectCanvasFigure(x, y, &CanvasFigures);
 				},
 
 
@@ -995,19 +811,6 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 					CloseRequested => {
 						println!("Are you ready to bid your window farewell? [Y/N]");
 						ExitRequest = true;
-
-
-// let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
-
-// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, String::from("ADD"));
-// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));
-
-// objects = DinamicAddFigures(&objects.clone(), &CanvasFiguresADD );
-
-
-// objects = DinamicDelFigure(&objects.clone(), 0 );
-// objects = DinamicDelFigure(&objects.clone(), 0 );
-
 					}
 					KeyboardInput {
 						input:

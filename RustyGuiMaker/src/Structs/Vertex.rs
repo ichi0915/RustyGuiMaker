@@ -1,31 +1,29 @@
 use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
-use vulkano::command_buffer::{AutoCommandBufferBuilder, DynamicState};
-use vulkano::device::{Device, DeviceExtensions};
-use vulkano::framebuffer::{Framebuffer, FramebufferAbstract, Subpass, RenderPassAbstract};
-use vulkano::image::SwapchainImage;
 #[allow(unused)]
 use vulkano::instance::{Instance, PhysicalDevice};
-use vulkano::pipeline::GraphicsPipeline;
-use vulkano::pipeline::viewport::Viewport;
-use vulkano::swapchain::{AcquireError, PresentMode, SurfaceTransform, Swapchain, SwapchainCreationError};
-use vulkano::swapchain;
-use vulkano::sync::{GpuFuture, FlushError};
-use vulkano::sync;
 #[allow(unused)]
-use vulkano_win::VkSurfaceBuild;
+use vulkano::device::{Device, DeviceExtensions};
+#[allow(unused)]
+use vulkano::swapchain::{AcquireError, PresentMode, SurfaceTransform, Swapchain, SwapchainCreationError};
+#[allow(unused)]
+use vulkano::sync::{GpuFuture, FlushError};
 #[allow(unused)]
 use winit::{EventsLoop, Window, WindowBuilder, Event, WindowEvent, Icon, KeyboardInput, ElementState, MouseCursor, MouseButton };
-#[allow(unused)]
-use std::thread;
-#[allow(unused)]
-use std::time::Duration;
+
+// use vulkano::command_buffer::{AutoCommandBufferBuilder, DynamicState};
+// use vulkano::framebuffer::{Framebuffer, FramebufferAbstract, Subpass, RenderPassAbstract};
+// use vulkano::image::SwapchainImage;
+// use vulkano::pipeline::GraphicsPipeline;
+// use vulkano::pipeline::viewport::Viewport;
+// use vulkano::swapchain;
+// use vulkano::sync;
+// use vulkano_win::VkSurfaceBuild;
+// use std::thread;
+// use std::time::Duration;
 
 
 
 use std::sync::Arc;
-use std::rc::Rc;
-
-
 
 
 /*
@@ -340,7 +338,8 @@ impl Figures {
 #[allow(unused)]
 pub struct CanvasFigures {
 	pub VertArray: Vec< std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>>,
-	pub callback: Vec<Option<String>>
+	// pub callback: Vec<Option<String>>
+	pub callback: Vec<crate::Structs::Callbacks::CallbackEmun>
 }
 
 
@@ -364,7 +363,8 @@ impl CanvasFigures {
 		let mut VertArray = CanvasFig.VertArray;
 
 
-		let mut callback = Vec::new();
+		let mut callback = CanvasFig.callback;
+		callback.push( crate::Structs::Callbacks::CallbackEmun::NON );
 
 
 
@@ -399,15 +399,14 @@ impl CanvasFigures {
 	}
 
 
-	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, func: String ) -> Self {
+	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, func: crate::Structs::Callbacks::CallbackEmun ) -> Self {
 
 		//let mut VertArray = Vec::new();
 		let mut VertArray = CanvasFig.VertArray;
 
 
-		let mut callback = Vec::new();
-		callback.push( Some( func  ) );
-
+		let mut callback = CanvasFig.callback;
+		callback.push(  func  );
 
 
 
@@ -431,6 +430,29 @@ impl CanvasFigures {
 			callback,
 		};
 		this
+	}
+
+
+
+	pub fn delFigure( CanvasFig: CanvasFigures, idDel: usize) -> Self {
+
+		//let mut VertArray = Vec::new();
+		// let mut VertArray = CanvasFig.VertArray;
+		let mut NewVertex = CanvasFigures::createCanvasFigures();
+
+		// let mut VertArray = CanvasFig.VertArray;
+
+		for (id, obj) in CanvasFig.VertArray.iter().enumerate() {
+			if idDel != id {
+				NewVertex.VertArray.push( obj.clone() );
+			}
+		}
+		for (id, obj) in CanvasFig.callback.iter().enumerate() {
+			if idDel != id {
+				NewVertex.callback.push( obj.clone() );
+			}
+		}
+		return NewVertex;
 	}
 
 }
