@@ -105,11 +105,17 @@ impl Vertex {
 
 */
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, PartialEq)]
 pub struct VertexBase {
 	position: [f32; 3],
 	color: [f32; 3],
 }
+
+// impl PartialEq for VertexBase {
+//     fn eq(&self, other: &Self) -> bool {
+//         self.position == other.position
+//     }
+// }
 
 vulkano::impl_vertex!(VertexBase, position, color);
 
@@ -358,10 +364,7 @@ impl CanvasFigures {
 		let mut VertArray = CanvasFig.VertArray;
 
 
-
-
 		let mut callback = Vec::new();
-
 
 
 
@@ -396,15 +399,14 @@ impl CanvasFigures {
 	}
 
 
-	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32 ) -> Self {
+	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, func: String ) -> Self {
 
 		//let mut VertArray = Vec::new();
 		let mut VertArray = CanvasFig.VertArray;
 
 
-
-
 		let mut callback = Vec::new();
+		callback.push( Some( func  ) );
 
 
 

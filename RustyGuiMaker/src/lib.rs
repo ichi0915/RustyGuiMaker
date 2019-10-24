@@ -271,6 +271,83 @@ impl ObjectPicker {
 
 
 
+pub fn DinamicAddFigures( objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>,
+						 objectsToAdd: &Structs::Vertex::CanvasFigures) ->
+						Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>> {
+						// NewObjects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>){
+
+	let mut NewObjects = vec![ ];
+
+	//los originales
+	for i in objects.iter() {
+		NewObjects.push( i.clone() );
+	}
+	//los nuevos
+	for i in objectsToAdd.VertArray.iter() {
+		NewObjects.push( i.clone() );
+	}
+
+	return NewObjects;
+}
+
+pub fn DinamicAddFigure( objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>,
+						objectToAdd: &Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>) ->
+						Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>{
+	// objects.pu
+	let mut NewObjects = vec![ ];
+
+	//los originales
+	for i in objects.iter() {
+		NewObjects.push( i.clone() );
+	}
+
+	NewObjects.push( objectToAdd.clone() );
+
+	return NewObjects;
+}
+
+
+
+
+pub fn DinamicDelFigure( objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>,
+						 idDel: usize) ->
+						Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>> {
+
+	let mut NewObjects = vec![ ];
+
+	for (id, object) in objects.iter().enumerate(){
+		if idDel != id {
+			NewObjects.push( object.clone() );
+		}
+	}
+
+	return NewObjects;
+}
+
+
+
+
+
+// pub fn DinamicDelFigures( objects: &Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>>,
+// 						 objectsToDel: &Structs::Vertex::CanvasFigures) ->
+// 						Vec<Arc<CpuAccessibleBuffer<[Structs::Vertex::VertexBase]>>> {
+
+// 	let mut NewObjects = vec![ ];
+
+// 	for (id, object) in objects.iter().enumerate(){
+// 		for (idDel, objectDel) in objectsToDel.VertArray.iter().enumerate(){
+// 			if idDel != id  {
+// 				NewObjects.push( object.clone() );
+// 			}
+// 		}
+// 	}
+
+// 	return NewObjects;
+// }
+
+
+
+
 
 
 
@@ -300,31 +377,140 @@ impl ObjectPicker {
 // // simple callback
 
 
+#[derive(Debug, Clone)]
+pub enum CallbackEmun {
+	ADD,
+	DEL,
+	MOD,
+	CSM
+}
+impl CallbackEmun {
+	pub fn as_str(&self) -> &'static str {
+		match *self {
+			CallbackEmun::ADD => "ADD",
+			CallbackEmun::DEL => "DEL",
+			CallbackEmun::MOD => "MOD",
+			CallbackEmun::CSM => "CSM"
+		}
+	}
 
+}
 
+#[derive(Debug, Clone)]
 struct Processor<CB> where CB: FnMut() {
-    callback: CB,
+	callback: CB,
+	callbackQueue: Vec<Option<CallbackEmun>>
+	// callbackQueue: Option<Vec<CallbackEmun>>
 }
 
+#[allow(unused_parens)]
 impl<CB> Processor<CB> where CB: FnMut() {
-    fn set_callback(&mut self, c: CB) {
-        self.callback = c;
-    }
+	fn set_callback(&mut self, c: CB) {
+		self.callback = c;
+	}
 
-    fn process_events(&mut self) {
-        (self.callback)();
-    }
+	fn process_events(&mut self, funcion: CallbackEmun) {
+
+		let funcionstr = CallbackEmun::as_str(&funcion);
+
+		if(funcionstr == "ADD" ){
+			self.AddFigToVec();
+		}
+		else if(funcionstr == "DEL" ){
+			self.DelFigToVec();
+		}
+		else if(funcionstr == "MOD" ){
+			self.ModFigToVec();
+		}
+		else if(funcionstr == "CSM" ){
+			self.CsmFigToVec();
+		}
+		else{
+			//Imposible
+			println!("Funcion no reconocida");
+			(self.callback)();
+		}
+	}
+
+	fn AddFigToVec(&mut self) {
+		let mut stack = self.callbackQueue.clone();
+		stack.push( Some(CallbackEmun::ADD) );
+
+		self.callbackQueue = stack;
+		println!("ADD",);
+	}
+
+	fn DelFigToVec(&mut self) {
+		let mut stack = self.callbackQueue.clone();
+		stack.push( Some(CallbackEmun::DEL) );
+
+		self.callbackQueue = stack;
+		println!("DEL",);
+	}
+
+	fn ModFigToVec(&mut self) {
+		println!("MOD",);
+	}
+
+	fn CsmFigToVec(&mut self) {
+		println!("CSM",);
+	}
+
+	fn GetQueue(&mut self) -> Vec<Option<CallbackEmun>> {
+		return self.callbackQueue.clone();
+	}
+
+	fn PrintQueue(&mut self) {
+		for d in &mut self.callbackQueue.clone() {
+			if let Some(ref mut du) = *d {
+				//Sin some
+				println!(" Print:  {:?}", du);
+			}
+			//Con some
+			// println!(" Print:  {:?}", d);
+		}
+	}
+
+	fn CleanQueue(&mut self)  {
+		self.callbackQueue = Vec::new( );
+	}
+
+	// fn DoQueue(&mut self) -> {
+	// 	for d in &mut self.callbackQueue.clone() {
+	// 		if let Some(ref mut du) = *d {
+	// 			println!(" Realizando: {:?}", du);
+
+	// 			let funcionstr = CallbackEmun::as_str(&du);
+	// 			if(funcionstr == "ADD" ){
+	// 				println!("ADD");
+	// 			}
+	// 			if(funcionstr == "DEL" ){
+	// 				self.DelFigToVec();
+	// 				println!("DEL");
+	// 			}
+	// 			if(funcionstr == "MOD" ){
+	// 				println!("MOD");
+	// 				self.ModFigToVec();
+	// 			}
+	// 			if(funcionstr == "CSM" ){
+	// 				println!("CSTM");
+	// 				self.CsmFigToVec();
+	// 			}
+	// 			else{
+	// 				println!("Funcion no reconocida");
+	// 			}
+
+
+	// 		}
+	// 	}
+	// 	self.callbackQueue.pop();
+	// }
+
 }
-
-
-
 
 
 
 //Errores Se muere cuando se minimiza
-
-
-
 pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 	//simple callback
@@ -334,9 +520,16 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 	let s = "world!".to_string();
 	// let callback = || println!("hello {}", s);
-	let callback = || {println!("hello {}", s); println!("hello {}", s); };
-    let mut p = Processor { callback: callback };
 
+	let callback = || {
+		println!("hello {}", s);
+	};
+
+	let mut p = Processor {
+		callback: callback,
+		callbackQueue: Vec::new( ),
+		// callbackQueue: Some( Vec::new() ),
+	};
 
 
 
@@ -429,8 +622,8 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 	let mut CanvasFigures = Structs::Vertex::CanvasFigures::createCanvasFigures();
 
-	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0);
-	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0);
+	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0, String::from("ADD"));
+	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0, String::from("DEL"));
 
 	let mut objects = vec![ ];
 
@@ -595,7 +788,14 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 				if let Some(clicked_idx) = clicked_entity {
 					if clicked_idx == i {
 						println!("Le picaste a {}", clicked_idx);
-						p.process_events();
+
+						if clicked_idx == 0{
+							p.process_events( CallbackEmun::ADD );
+						}
+						else if clicked_idx == 1{
+							p.process_events( CallbackEmun::DEL );
+						}
+
 						clicked_entity = None;
 					} else {
 					}
@@ -618,6 +818,49 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 				.draw(pipeline.clone(), &dynamic_state, obj.clone(), (), pc)
 				.unwrap();
 		}
+
+		// p.PrintQueue();
+
+		let Queue = p.GetQueue();
+
+		// for d in &mut Queue.clone() {
+		// 	if let Some(ref mut du) = *d {
+		// 		//Sin some
+		// 		println!(" Print:  {:?}", du);
+		// 	}
+		// }
+
+		for d in &mut Queue.clone() {
+			if let Some(ref mut du) = *d {
+				println!(" Realizando: {:?}", du);
+
+				let funcionstr = CallbackEmun::as_str(&du.clone());
+
+				if funcionstr == "ADD" {
+					let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
+
+					CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, String::from("ADD"));
+					// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));
+
+					objects = DinamicAddFigures(&objects.clone(), &CanvasFiguresADD );
+				}
+				else if funcionstr == "DEL" {
+					objects = DinamicDelFigure(&objects.clone(), 2 );
+				}
+				else if funcionstr == "MOD" {
+					println!("MOD");
+				}
+				else if funcionstr == "CSM" {
+					println!("CSTM");
+				}
+				else{
+					println!("Funcion no reconocida");
+				}
+			}
+		}
+		p.CleanQueue();
+
+		// p.DoQueue();
 
 
 		// Finish building the command buffer by calling `build`.
@@ -738,7 +981,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 					println!("Le picaste \"{:?}\"", 5);
 				},*/
 				Event::WindowEvent { event: WindowEvent::Moved ( _delta ), ..} => {
-					println!("Se movio la entana \"{:?}\"", 3);
+					// println!("Se movio la entana \"{:?}\"", 3);
 					window.set_cursor(cursors[cursor_idx]);
 					if cursor_idx < cursors.len() - 1 {
 						cursor_idx += 1;
@@ -752,6 +995,19 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 					CloseRequested => {
 						println!("Are you ready to bid your window farewell? [Y/N]");
 						ExitRequest = true;
+
+
+// let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
+
+// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, String::from("ADD"));
+// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));
+
+// objects = DinamicAddFigures(&objects.clone(), &CanvasFiguresADD );
+
+
+// objects = DinamicDelFigure(&objects.clone(), 0 );
+// objects = DinamicDelFigure(&objects.clone(), 0 );
+
 					}
 					KeyboardInput {
 						input:
