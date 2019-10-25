@@ -63,6 +63,39 @@ use std::iter;
 
 
 
+//guero
+//Errores Se muere cuando se minimiza
+//Genereador de figuras, con mapa de vertex
+//cstm callbacks
+//kien recive el io, focus, pidiendo el focus o con tab
+
+//ichi
+//seleccionar con un id pero no numerico ke sea un nombre,porke ahorita solo hay ids y esos cambian
+//enum de colores
+//rusty text
+
+//kien sea
+//img
+
+
+//guero not now
+//Merge de objetos
+
+
+// let mut Figures = Structs::Vertex::Figures::addFigure();
+//controles 
+//cola de mensajes - a los callbacks
+//hit test el clikeado, va desde adelante hasta atras para ver si le pico a alguien hasta ke true
+
+
+
+
+
+
+
+
+
+
 //#[derive(Debug, Clone)]
 #[derive(Default, Copy, Clone)]
 pub struct Vertex {
@@ -354,7 +387,6 @@ impl ObjectPicker {
 
 
 
-//Errores Se muere cuando se minimiza
 pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 	let s = "world!".to_string();
@@ -604,13 +636,14 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 						println!("Le picaste a {}", clicked_idx);
 
 						if clicked_idx == 0{
-							println!("00000000000000000 {:?}", CanvasFigures.callback[clicked_idx]);
+							// println!("00000000000000000 {:?}", CanvasFigures.callback[clicked_idx]);
 							// let lol =  CanvasFigures.callback[clicked_idx].clone();
 							// p.process_events( CanvasFigures.callback[clicked_idx].clone() );
+							// let funcionstr =  Structs::Callbacks::CallbackEmun::as_str( &CanvasFigures.callback[clicked_idx].clone());
 							p.process_events( Structs::Callbacks::CallbackEmun::ADD );
 						}
 						else if clicked_idx == 1{
-							println!("1111111111111111 {:?}", CanvasFigures.callback[clicked_idx]);
+							// println!("1111111111111111 {:?}", CanvasFigures.callback[clicked_idx]);
 							p.process_events( Structs::Callbacks::CallbackEmun::DEL );
 						}
 

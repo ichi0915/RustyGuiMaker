@@ -25,7 +25,6 @@ use winit::{EventsLoop, Window, WindowBuilder, Event, WindowEvent, Icon, Keyboar
 
 use std::sync::Arc;
 
-
 /*
 
 #[derive(Default, Debug, Clone)]
