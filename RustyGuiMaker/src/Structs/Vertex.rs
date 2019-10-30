@@ -362,39 +362,50 @@ impl CanvasFigures {
 
 	pub fn addFigureDefault( CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, key: String ) -> Self{
 
-		// let mut VertArray = Vec::new();
+		let mut KeyExist = false;
+
+		for (id, obj) in CanvasFig.Key.iter().enumerate() {
+			if obj.eq(&key) {
+				KeyExist = true;
+				break;
+			}
+		}
+
 		let mut VertArray = CanvasFig.VertArray;
-
 		let mut Key = CanvasFig.Key;
-		Key.push( key );
-
 		let mut callback = CanvasFig.callback;
-		callback.push( crate::Structs::Callbacks::CallbackEmun::NON );
+
+		if !KeyExist{
+
+			Key.push( key );
+			callback.push( crate::Structs::Callbacks::CallbackEmun::NON );
 
 
 
-		// let Vertex = match Fig {
-		// 	// Figures::Line => Linea::initialize(deviceTmp: Arc<Device>, Size: i8, Multiplier: f32, XMovement: f32, YMovement: f32),
-		// 	Figures::Line => "asd",
-		// 	Figures::Plane => Rectangulo::initializeDefault(deviceTmp.clone()),
-		// 	Figures::Circle => "Circle",
-		// 	Figures::Triangle => TrianguloEquilatero::initializeDefault(deviceTmp.clone())
-		// };
+			// let Vertex = match Fig {
+			// 	// Figures::Line => Linea::initialize(deviceTmp: Arc<Device>, Size: i8, Multiplier: f32, XMovement: f32, YMovement: f32),
+			// 	Figures::Line => "asd",
+			// 	Figures::Plane => Rectangulo::initializeDefault(deviceTmp.clone()),
+			// 	Figures::Circle => "Circle",
+			// 	Figures::Triangle => TrianguloEquilatero::initializeDefault(deviceTmp.clone())
+			// };
 
-		let Figstr = Figures::as_str(&Fig);
-		let NewVertex : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>;
+			let Figstr = Figures::as_str(&Fig);
+			let NewVertex : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>;
 
-		if(Figstr == "Plane" ){
-			NewVertex = Rectangulo::initializeDefault(deviceTmp.clone()).Vert.clone();
+			if(Figstr == "Plane" ){
+				NewVertex = Rectangulo::initializeDefault(deviceTmp.clone()).Vert.clone();
+			}
+			else if(Figstr == "Triangle" ){
+				NewVertex = TrianguloEquilatero::initializeDefault(deviceTmp.clone()).Vert.clone();
+			}
+			else{
+				NewVertex = Rectangulo::initializeDefault(deviceTmp.clone()).Vert.clone();
+			}
+
+			VertArray.push( NewVertex );
 		}
-		else if(Figstr == "Triangle" ){
-			NewVertex = TrianguloEquilatero::initializeDefault(deviceTmp.clone()).Vert.clone();
-		}
-		else{
-			NewVertex = Rectangulo::initializeDefault(deviceTmp.clone()).Vert.clone();
-		}
 
-		VertArray.push( NewVertex );
 
 		let mut this = Self {
 			VertArray,
@@ -407,31 +418,40 @@ impl CanvasFigures {
 
 	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, func: crate::Structs::Callbacks::CallbackEmun, key: String ) -> Self {
 
-		//let mut VertArray = Vec::new();
+
+		let mut KeyExist = false;
+
+		for (id, obj) in CanvasFig.Key.iter().enumerate() {
+			if obj.eq(&key) {
+				KeyExist = true;
+				break;
+			}
+		}
+
 		let mut VertArray = CanvasFig.VertArray;
-
 		let mut Key = CanvasFig.Key;
-		Key.push( key );
-
 		let mut callback = CanvasFig.callback;
-		callback.push(  func  );
 
+		if !KeyExist{
 
+			Key.push( key );
+			callback.push(  func  );
 
-		let Figstr = Figures::as_str(&Fig);
-		let NewVertex : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>;
+			let Figstr = Figures::as_str(&Fig);
+			let NewVertex : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>;
 
-		if(Figstr == "Plane" ){
-			NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+			if(Figstr == "Plane" ){
+				NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+			}
+			else if(Figstr == "Triangle" ){
+				NewVertex = TrianguloEquilatero::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+			}
+			else{
+				NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+			}
+
+			VertArray.push( NewVertex );
 		}
-		else if(Figstr == "Triangle" ){
-			NewVertex = TrianguloEquilatero::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
-		}
-		else{
-			NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
-		}
-
-		VertArray.push( NewVertex );
 
 		let mut this = Self {
 			VertArray,

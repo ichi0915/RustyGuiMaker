@@ -683,7 +683,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 					println!("ADD");
 
 					CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, Structs::Callbacks::CallbackEmun::ADD, String::from("Din1"));
-					print!("El ID de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::GetFigureID(CanvasFigures.clone()  , "Din1".to_string()));
+					print!("El ID de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::GetFigureID(CanvasFigures.clone() , "Din1".to_string()));
 
 					// let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
 					// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));
