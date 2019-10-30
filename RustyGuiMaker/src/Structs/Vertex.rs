@@ -106,6 +106,8 @@ impl Vertex {
 pub struct VertexBase {
 	position: [f32; 3],
 	color: [f32; 3],
+	// color: <crate::Structs::Colors::Color>::colorRGB,
+	// crate::Structs::Colors::Color::colorRGB
 }
 
 // impl PartialEq for VertexBase {
@@ -191,17 +193,25 @@ pub struct Rectangulo {
 
 #[allow(unused)]
 impl Rectangulo {
-	pub fn initialize(deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32 ) -> Self {
+	pub fn initialize(deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, Color: String ) -> Self {
 
 		let Vert = {
 			CpuAccessibleBuffer::from_iter(deviceTmp , BufferUsage::all(), [
-				VertexBase { position: [-1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
+				// VertexBase { position: [-1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
+				// VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
+				// VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
 
-				VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], }
+				// VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
+				// VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
+				// VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], }
+
+				VertexBase { position: [-1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+
+				VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), }
 			].iter().cloned()).unwrap()
 		};
 
@@ -215,7 +225,7 @@ impl Rectangulo {
 
 		this
 	}
-	pub fn initializeDefault(deviceTmp: Arc<Device> ) -> Self {
+	pub fn initializeDefault(deviceTmp: Arc<Device>, Color: String ) -> Self {
 
 		let Multiplier = 0.1;
 		let XMovement = 0.0;
@@ -223,13 +233,13 @@ impl Rectangulo {
 
 		let Vert = {
 			CpuAccessibleBuffer::from_iter(deviceTmp , BufferUsage::all(), [
-				VertexBase { position: [-1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
+				VertexBase { position: [-1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
 
-				VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], },
-				VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 1.0, 0.0], }
+				VertexBase { position: [ 1.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), }
 			].iter().cloned()).unwrap()
 		};
 
@@ -259,13 +269,13 @@ pub struct TrianguloEquilatero {
 
 #[allow(unused)]
 impl TrianguloEquilatero {
-	pub fn initialize(deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32 ) -> Self {
+	pub fn initialize(deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, Color: String ) -> Self {
 
 		let Vert = {
 			CpuAccessibleBuffer::from_iter(deviceTmp , BufferUsage::all(), [
-				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], },
-				VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], },
-				VertexBase { position: [ 0.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], }
+				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [ 0.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), }
 				].iter().cloned()).unwrap()
 		};
 
@@ -280,7 +290,7 @@ impl TrianguloEquilatero {
 		this
 	}
 
-	pub fn initializeDefault(deviceTmp: Arc<Device> ) -> Self {
+	pub fn initializeDefault(deviceTmp: Arc<Device>, Color: String) -> Self {
 
 		let Multiplier = 0.1;
 		let XMovement = 0.5;
@@ -288,9 +298,9 @@ impl TrianguloEquilatero {
 
 		let Vert = {
 			CpuAccessibleBuffer::from_iter(deviceTmp , BufferUsage::all(), [
-				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], },
-				VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], },
-				VertexBase { position: [ 0.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: [1.0, 0.0, 0.0], }
+				VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), },
+				VertexBase { position: [ 0.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), }
 				].iter().cloned()).unwrap()
 		};
 
@@ -394,13 +404,16 @@ impl CanvasFigures {
 			let NewVertex : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>;
 
 			if(Figstr == "Plane" ){
-				NewVertex = Rectangulo::initializeDefault(deviceTmp.clone()).Vert.clone();
+				let Color = "YELLOW".to_string();
+				NewVertex = Rectangulo::initializeDefault(deviceTmp.clone(), Color).Vert.clone();
 			}
 			else if(Figstr == "Triangle" ){
-				NewVertex = TrianguloEquilatero::initializeDefault(deviceTmp.clone()).Vert.clone();
+				let Color = "RED".to_string();
+				NewVertex = TrianguloEquilatero::initializeDefault(deviceTmp.clone(), Color).Vert.clone();
 			}
 			else{
-				NewVertex = Rectangulo::initializeDefault(deviceTmp.clone()).Vert.clone();
+				let Color = "Yellow".to_string();
+				NewVertex = Rectangulo::initializeDefault(deviceTmp.clone(), Color).Vert.clone();
 			}
 
 			VertArray.push( NewVertex );
@@ -416,8 +429,7 @@ impl CanvasFigures {
 	}
 
 
-	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, func: crate::Structs::Callbacks::CallbackEmun, key: String ) -> Self {
-
+	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, Color: String, func: crate::Structs::Callbacks::CallbackEmun, key: String ) -> Self {
 
 		let mut KeyExist = false;
 
@@ -441,13 +453,13 @@ impl CanvasFigures {
 			let NewVertex : std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>;
 
 			if(Figstr == "Plane" ){
-				NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+				NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color).Vert.clone();
 			}
 			else if(Figstr == "Triangle" ){
-				NewVertex = TrianguloEquilatero::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+				NewVertex = TrianguloEquilatero::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color).Vert.clone();
 			}
 			else{
-				NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement).Vert.clone();
+				NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color).Vert.clone();
 			}
 
 			VertArray.push( NewVertex );
@@ -546,11 +558,11 @@ pub struct Linea {
 
 #[allow(unused)]
 impl Linea {
-	pub fn initialize(deviceTmp: Arc<Device>, Size: i8, Multiplier: f32, XMovement: f32, YMovement: f32  ) -> Self {
+	pub fn initialize(deviceTmp: Arc<Device>, Size: i8, Multiplier: f32, XMovement: f32, YMovement: f32, Color: String  ) -> Self {
 
 	let mut VertArray = Vec::new();
 
-	let Rec = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement);
+	let Rec = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color.clone());
 
 	for i in (0..).take(Size as usize){
 
@@ -559,7 +571,7 @@ impl Linea {
 		let X = Rec.XMovement.clone();
 		let Y = Rec.YMovement.clone();
 
-		let NewRec = Rectangulo::initialize( deviceTmp.clone(), Multiplier, X + Multiplier * i as f32, Y);
+		let NewRec = Rectangulo::initialize( deviceTmp.clone(), Multiplier, X + Multiplier * i as f32, Y, Color.clone());
 		let Vert = NewRec.Vert.clone();
 
 		VertArray.push( Vert );
