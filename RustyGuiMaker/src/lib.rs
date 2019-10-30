@@ -475,9 +475,8 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 	let mut CanvasFigures = Structs::Vertex::CanvasFigures::createCanvasFigures();
 
-	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0, Structs::Callbacks::CallbackEmun::ADD);
-	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0, Structs::Callbacks::CallbackEmun::DEL);
-
+	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0, Structs::Callbacks::CallbackEmun::ADD, String::from("Cuad1"));
+	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0, Structs::Callbacks::CallbackEmun::DEL, String::from("Trian1"));
 
 	let vs = Structs::Shaders::vs::Shader::load(device.clone()).unwrap();
 	let fs = Structs::Shaders::fs::Shader::load(device.clone()).unwrap();
@@ -683,7 +682,8 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 				if funcionstr == "ADD" {
 					println!("ADD");
 
-					CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, Structs::Callbacks::CallbackEmun::ADD);
+					CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, Structs::Callbacks::CallbackEmun::ADD, String::from("Din1"));
+					print!("El ID de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::GetFigureID(CanvasFigures.clone()  , "Din1".to_string()));
 
 					// let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
 					// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));

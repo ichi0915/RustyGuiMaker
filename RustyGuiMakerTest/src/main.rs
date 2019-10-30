@@ -23,11 +23,6 @@ fn main() {
 
 	//let mut Figure = String::from("");
 
-	// let mut Figures = Structs::Vertex::Figures::addFigure();
-	//controles 
-	//cola de mensajes - a los callbacks
-	//hit test el clikeado, va desde adelante hasta atras para ver si le pico a alguien hasta ke true
-
 	RustyGuiMaker::UseRustyInstance(WindowInstance);
 }
 

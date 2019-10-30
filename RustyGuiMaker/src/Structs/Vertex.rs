@@ -335,10 +335,12 @@ impl Figures {
 
 
 #[allow(unused)]
+#[derive(Debug, Clone)]
 pub struct CanvasFigures {
 	pub VertArray: Vec< std::sync::Arc<vulkano::buffer::CpuAccessibleBuffer<[VertexBase]>>>,
 	// pub callback: Vec<Option<String>>
-	pub callback: Vec<crate::Structs::Callbacks::CallbackEmun>
+	pub callback: Vec<crate::Structs::Callbacks::CallbackEmun>,
+	pub Key: Vec<String>
 }
 
 
@@ -348,19 +350,23 @@ impl CanvasFigures {
 	pub fn createCanvasFigures() -> Self{
 		let mut VertArray = Vec::new();
 		let mut callback = Vec::new();
+		let mut Key = Vec::new();
 
 		let mut this = Self {
 			VertArray,
 			callback,
+			Key,
 		};
 		this
 	}
 
-	pub fn addFigureDefault( CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device> ) -> Self{
+	pub fn addFigureDefault( CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, key: String ) -> Self{
 
 		// let mut VertArray = Vec::new();
 		let mut VertArray = CanvasFig.VertArray;
 
+		let mut Key = CanvasFig.Key;
+		Key.push( key );
 
 		let mut callback = CanvasFig.callback;
 		callback.push( crate::Structs::Callbacks::CallbackEmun::NON );
@@ -393,16 +399,19 @@ impl CanvasFigures {
 		let mut this = Self {
 			VertArray,
 			callback,
+			Key,
 		};
 		this
 	}
 
 
-	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, func: crate::Structs::Callbacks::CallbackEmun ) -> Self {
+	pub fn addFigure(CanvasFig: Self, Fig: Figures, deviceTmp: Arc<Device>, Multiplier: f32, XMovement: f32, YMovement: f32, func: crate::Structs::Callbacks::CallbackEmun, key: String ) -> Self {
 
 		//let mut VertArray = Vec::new();
 		let mut VertArray = CanvasFig.VertArray;
 
+		let mut Key = CanvasFig.Key;
+		Key.push( key );
 
 		let mut callback = CanvasFig.callback;
 		callback.push(  func  );
@@ -427,6 +436,7 @@ impl CanvasFigures {
 		let mut this = Self {
 			VertArray,
 			callback,
+			Key,
 		};
 		this
 	}
@@ -451,7 +461,40 @@ impl CanvasFigures {
 				NewVertex.callback.push( obj.clone() );
 			}
 		}
+		for (id, obj) in CanvasFig.Key.iter().enumerate() {
+			if idDel != id {
+				NewVertex.Key.push( obj.clone() );
+			}
+		}
 		return NewVertex;
+	}
+
+
+	pub fn GetFigureID( CanvasFig: CanvasFigures, KEY: String) -> usize {
+
+		let mut ID = 9999999999;
+
+		for (id, obj) in CanvasFig.Key.iter().enumerate() {
+			//if obj == KEY {
+			if obj.eq(&KEY) {
+				ID = id;
+				break;
+			}
+		}
+		return ID;
+	}
+
+	//No se usa
+	pub fn GetFigureKEY( CanvasFig: CanvasFigures, idDel: usize) -> String {
+		let mut KEY = String::from("");
+
+		for (id, obj) in CanvasFig.VertArray.iter().enumerate() {
+			if idDel == id {
+				KEY = id.to_string();
+				break;
+			}
+		}
+		return KEY;
 	}
 
 }
