@@ -1,5 +1,4 @@
 
-use vulkano::buffer::{BufferUsage, CpuAccessibleBuffer};
 #[allow(unused)]
 use vulkano::instance::{Instance, PhysicalDevice};
 #[allow(unused)]
@@ -15,9 +14,14 @@ use winit::{EventsLoop, Window, WindowBuilder, Event, WindowEvent, Icon, Keyboar
 
 pub enum ColorList {
 	RED,
-	Green,
+	GREEN,
 	BlUE,
-	Yellow
+	YELLOW,
+	CYAN,
+	PURPLE,
+	BLACK,
+	WHITE,
+	CSTM
 }
 
 #[derive(Default, Debug, Clone, PartialEq)]
@@ -63,7 +67,8 @@ impl Color {
 		}
 	}
 
-	pub fn CustomColor() -> [f32; 3] {
-		return [1.0, 1.0, 0.0];
+	pub fn CustomColor(Color: [f32; 3]) -> [f32; 3] {
+		// return [1.0, 1.0, 0.0];
+		return Color;
 	}
 }

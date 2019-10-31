@@ -185,6 +185,7 @@ impl ObjectPicker {
 		.expect("Failed to create buffer");
 
 		//
+
 		let vs = Structs::Shaders::pick_vs::Shader::load(queue.device().clone()).unwrap();
 		let fs = Structs::Shaders::pick_fs::Shader::load(queue.device().clone()).unwrap();
 
@@ -446,7 +447,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 	let device_ext = DeviceExtensions { khr_swapchain: true, .. DeviceExtensions::none() };
 	let (device, mut queues) = Device::new(physical, physical.supported_features(), &device_ext, [(queue_family, 0.5)].iter().cloned()).unwrap();
-	let (device3, mut queues3) = Device::new(physical, physical.supported_features(), &device_ext, [(queue_family, 0.5)].iter().cloned()).unwrap();
+	//let (device3, mut queues3) = Device::new(physical, physical.supported_features(), &device_ext, [(queue_family, 0.5)].iter().cloned()).unwrap();
 
 	let queue = queues.next().unwrap();
 
@@ -477,6 +478,26 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 
 	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0, "RED".to_string(), Structs::Callbacks::CallbackEmun::ADD, String::from("Cuad1"));
 	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0, "YELLOW".to_string(), Structs::Callbacks::CallbackEmun::DEL, String::from("Trian1"));
+
+
+
+	let mut CSTMVert = Vec::new();
+	CSTMVert.push(Structs::Vertex::Points { Position: [-1.0,-1.0, 0.0], });
+	CSTMVert.push(Structs::Vertex::Points { Position: [ 1.0,-1.0, 0.0], });
+	CSTMVert.push(Structs::Vertex::Points { Position: [-1.0, 1.0, 0.0], });
+	CSTMVert.push(Structs::Vertex::Points { Position: [ 1.0,-1.0, 0.0], });
+	CSTMVert.push(Structs::Vertex::Points { Position: [-1.0, 1.0, 0.0], });
+	CSTMVert.push(Structs::Vertex::Points { Position: [ 1.0, 1.0, 0.0], });
+	CanvasFigures = Structs::Vertex::CanvasFigures::addCSTMFigure( CanvasFigures, CSTMVert, device.clone(), 0.1, -0.5, 0.0, "PURPLE".to_string(), Structs::Callbacks::CallbackEmun::NON , String::from("CSTMFIG"));
+
+
+	let mut CSTMVert2 = Vec::new();
+	CSTMVert2.push(Structs::Vertex::Points { Position: [-1.0,-1.0, 0.0], });
+	CSTMVert2.push(Structs::Vertex::Points { Position: [ 1.0,-1.0, 0.0], });
+	CSTMVert2.push(Structs::Vertex::Points { Position: [-1.0, 1.0, 0.0], });
+	CanvasFigures = Structs::Vertex::CanvasFigures::addCSTMFigure( CanvasFigures, CSTMVert2, device.clone(), 0.1, -0.5, 0.5, "GREEN".to_string(), Structs::Callbacks::CallbackEmun::NON , String::from("CSTMFIG2"));
+
+
 
 	let vs = Structs::Shaders::vs::Shader::load(device.clone()).unwrap();
 	let fs = Structs::Shaders::fs::Shader::load(device.clone()).unwrap();
@@ -683,7 +704,16 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 					println!("ADD");
 
 					CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, "CYAN".to_string(), Structs::Callbacks::CallbackEmun::ADD, String::from("Din1"));
-					print!("El ID de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::GetFigureID(CanvasFigures.clone() , "Din1".to_string()));
+					let DinFigureID = Structs::Vertex::CanvasFigures::getFigureID(CanvasFigures.clone() , "Din1".to_string());
+					println!("El ID de la figura generada es:{:?}", DinFigureID);
+					println!("El Color de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureColor(CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureCallback(CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la VertexBase generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureVertexBase(CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la Multiplier generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureMultiplier(CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la XMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureXMovement(CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la YMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureYMovement(CanvasFigures.clone() , DinFigureID));
+
+					// CanvasFigures = Structs::Vertex::CanvasFigures::changefigureColor(CanvasFigures.clone(), device.clone(), "BlUE".to_string(), 0 );
 
 					// let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
 					// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));
@@ -778,6 +808,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 				//Event::WindowEvent { event: WindowEvent::KeyboardInput , .. } => recreate_swapchain = true,
 				Event::WindowEvent { event: WindowEvent::ReceivedCharacter('w') , .. } => {
 					println!("le picaste a la W");
+					
 				},
 
 
