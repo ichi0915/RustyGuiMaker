@@ -432,10 +432,10 @@ impl CanvasFigures {
 				NewVertexBase = TrianguloEquilatero::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color).Vert.clone();
 				NewVertex = CanvasFigures::GenerateCPU( deviceTmp.clone(), NewVertexBase.clone());
 			}
-			else if(Figstr == "CSTM" ){
-				NewVertexBase = TrianguloEquilatero::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color).Vert.clone();
-				NewVertex = CanvasFigures::GenerateCPU( deviceTmp.clone(), NewVertexBase.clone());
-			}
+			// else if(Figstr == "CSTM" ){
+			// 	NewVertexBase = TrianguloEquilatero::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color).Vert.clone();
+			// 	NewVertex = CanvasFigures::GenerateCPU( deviceTmp.clone(), NewVertexBase.clone());
+			// }
 			else{
 				// NewVertex = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color).Vert.clone();
 				NewVertexBase = Rectangulo::initialize( deviceTmp.clone(), Multiplier, XMovement, YMovement, Color).Vert.clone();
