@@ -555,14 +555,11 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado origina
 
 	let mut previous_frame_end = Box::new(sync::now(RGMinst.device.clone().unwrap().clone())) as Box<dyn GpuFuture>;
 
-
-
 	let mut object_picker = ObjectPicker::new(queue.clone(), dimensions);
 	let mut mouse_x = 0.0;
 	let mut mouse_y = 0.0;
 	let mut selected_entity = None;
 	let mut clicked_entity = None;
-
 
 	let mut done = false;
 	let mut ExitRequest = false;
