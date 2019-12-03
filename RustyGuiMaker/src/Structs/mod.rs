@@ -233,13 +233,13 @@ impl RGMRequirements {
 
 #[allow(unused)]
 //#[derive(Clone)]
-pub struct RGMinstance {
+pub struct RGMinstanceORG {
 	pub Window: RGMWindow,
 	pub Requirements: RGMRequirements
 }
 
 #[allow(unused)]
-impl RGMinstance {
+impl RGMinstanceORG {
 	pub fn initialize() -> Self {
 
 		let Window = RGMWindow::default();
@@ -266,3 +266,72 @@ impl RGMinstance {
 		this
 	}
 }
+
+
+
+#[allow(unused)]
+//#[derive(Clone)]
+pub struct RGMinstance {
+	pub Window: RGMWindow,
+	pub Requirements: RGMRequirements,
+	//Option<f64>
+	pub CanvasFigures: Vertex::CanvasFigures,
+	pub queues: Option<vulkano::device::QueuesIter>,
+	pub device: Option<std::sync::Arc<vulkano::device::Device>>
+
+}
+
+#[allow(unused)]
+impl RGMinstance {
+	pub fn initialize() -> Self {
+
+		let Window = RGMWindow::default();
+		let Requirements = RGMRequirements::initialize();
+
+		let CanvasFigures = Vertex::CanvasFigures::createCanvasFigures();
+		let queues = None;
+		let device = None;
+
+		let mut this = Self {
+			Window,
+			Requirements,
+			queues,
+			device,
+			CanvasFigures,
+		};
+
+		this
+	}
+
+	pub fn initializeWithWindowStruct(RGMinst: RGMinstance) -> Self {
+
+		let Window = RGMinst.Window;
+		let Requirements = RGMRequirements::initialize();
+
+		let CanvasFigures = RGMinst.CanvasFigures;
+		let queues = RGMinst.queues;
+		let device = RGMinst.device;
+
+		let mut this = Self {
+			Window,
+			Requirements,
+			queues,
+			device,
+			CanvasFigures,
+		};
+
+		this
+	}
+
+	pub fn Setdevice(&mut self, device: Option<std::sync::Arc<vulkano::device::Device>>) {
+		self.device = device;
+	}
+	pub fn Setqueues(&mut self, queues: Option<vulkano::device::QueuesIter>) {
+		self.queues = queues;
+	}
+	pub fn Setsurface(&mut self, surface: RGMRequirements ) {
+		//self.queues = queues;
+	}
+
+}
+

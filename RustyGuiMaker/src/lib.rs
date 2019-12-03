@@ -388,10 +388,78 @@ impl ObjectPicker {
 
 
 
-pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
+pub fn StartRustyInstance(mut RGMinst : Structs::RGMinstance)-> Structs::RGMinstance{
+	RGMinst = Structs::RGMinstance::initializeWithWindowStruct(RGMinst);
+	//let window = vulkanInstance.Requirements.surface.window();
+
+	let physical = PhysicalDevice::enumerate( &RGMinst.Requirements.instance ).next().unwrap();
+	println!("Using device: {} (type: {:?})", physical.name(), physical.ty());
+
+	let surface = RGMinst.Requirements.surface.window();
+
+	//Set Window Title
+	if RGMinst.Window.WindowTitle.is_some(){
+		surface.set_title( &Option::as_ref( &Arc::new( RGMinst.Window.GetWindowTitle()) ).unwrap() );
+	}
+
+	//Set Window icon
+	if RGMinst.Window.WindowIcon.is_some() {
+		surface.set_window_icon(Some(Option::as_ref(&Arc::new(RGMinst.Window.GetWindowIcon())).unwrap().clone() ));
+	}
+
+	//Set initial size
+	if RGMinst.Window.Width.is_some()  && RGMinst.Window.Height.is_some()  {
+		surface.set_inner_size( LogicalSize::new(  RGMinst.Window.GetWidth().unwrap()  , RGMinst.Window.GetHeight().unwrap() ));
+	}
+
+	//Set min size
+	if RGMinst.Window.MinWidth.is_some()  && RGMinst.Window.MinHeight.is_some()  {
+		surface.set_min_dimensions( Some( LogicalSize::new(  RGMinst.Window.GetMinWidth().unwrap()  , RGMinst.Window.GetMinHeight().unwrap() )));
+	}
+
+	//Set max size
+	if RGMinst.Window.MaxWidth.is_some()  && RGMinst.Window.MaxHeight.is_some()  {
+		surface.set_max_dimensions( Some( LogicalSize::new(  RGMinst.Window.GetMaxWidth().unwrap()  , RGMinst.Window.GetMaxHeight().unwrap() )));
+	}
+
+	let queue_family = physical.queue_families().find(|&q| {
+		// We take the first queue that supports drawing to our window.
+		q.supports_graphics() && RGMinst.Requirements.surface.is_supported(q).unwrap_or(false)
+	}).unwrap();
+
+
+	let device_ext = DeviceExtensions { khr_swapchain: true, .. DeviceExtensions::none() };
+	let (device, mut queues) = Device::new(physical, physical.supported_features(), &device_ext, [(queue_family, 0.5)].iter().cloned()).unwrap();
+
+	RGMinst.Setdevice( Some(device) );
+	RGMinst.Setqueues( Some(queues) );
+
+	//RGMinst.Setsurface(surface);
+
+	return RGMinst;
+}
+
+pub fn ADDFigRustyInstance(mut RGMinst : Structs::RGMinstance, Fig: Structs::Vertex::Figures, Multiplier: f32, XMovement: f32, YMovement: f32, Color: String, func: Structs::Callbacks::CallbackEmun, key: String )-> Structs::RGMinstance{
+
+	RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::addFigure(RGMinst.CanvasFigures, Fig, RGMinst.device.clone().unwrap().clone(), Multiplier, XMovement, YMovement,Color, func, key);
+
+	return RGMinst;
+}
+
+
+pub fn ADDCSTMFigRustyInstance(mut RGMinst : Structs::RGMinstance, lcVertexBase: Vec<Structs::Vertex::Points>, Multiplier: f32, XMovement: f32, YMovement: f32, Color: String, func: Structs::Callbacks::CallbackEmun, key: String )-> Structs::RGMinstance{
+
+	RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::addCSTMFigure(RGMinst.CanvasFigures, lcVertexBase, RGMinst.device.clone().unwrap().clone(), Multiplier, XMovement, YMovement,Color, func, key);
+
+	return RGMinst;
+}
+
+
+
+
+pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado original
 
 	let s = "world!".to_string();
-	// let callback = || println!("hello {}", s);
 
 	let callback = || {
 		println!("hello {}", s);
@@ -400,65 +468,21 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 	let mut p = Structs::Callbacks::Processor {
 		callback: callback,
 		callbackQueue: Vec::new( ),
-		// callbackQueue: Some( Vec::new() ),
 	};
 
 
-
-
-	let mut vulkanInstance = Structs::RGMinstance::initializeWithWindowStruct(WindowStruct);
-	//let window = &vulkanInstance.Requirements.surface.window(); //tambien jala
-	let window = vulkanInstance.Requirements.surface.window();
-
-	let physical = PhysicalDevice::enumerate( &vulkanInstance.Requirements.instance ).next().unwrap();
-	println!("Using device: {} (type: {:?})", physical.name(), physical.ty());
-
-
-	//Set Window Title
-	if vulkanInstance.Window.WindowTitle.is_some(){
-		window.set_title( &Option::as_ref( &Arc::new( vulkanInstance.Window.GetWindowTitle()) ).unwrap() );
-	}
-
-	//Set Window icon
-	if vulkanInstance.Window.WindowIcon.is_some() {
-		window.set_window_icon(Some(Option::as_ref(&Arc::new(vulkanInstance.Window.GetWindowIcon())).unwrap().clone() ));
-	}
-
-	//Set initial size
-	if vulkanInstance.Window.Width.is_some()  && vulkanInstance.Window.Height.is_some()  {
-		window.set_inner_size( LogicalSize::new(  vulkanInstance.Window.GetWidth().unwrap()  , vulkanInstance.Window.GetHeight().unwrap() ));
-	}
-
-	//Set min size
-	if vulkanInstance.Window.MinWidth.is_some()  && vulkanInstance.Window.MinHeight.is_some()  {
-		window.set_min_dimensions( Some( LogicalSize::new(  vulkanInstance.Window.GetMinWidth().unwrap()  , vulkanInstance.Window.GetMinHeight().unwrap() )));
-	}
-
-	//Set max size
-	if vulkanInstance.Window.MaxWidth.is_some()  && vulkanInstance.Window.MaxHeight.is_some()  {
-		window.set_max_dimensions( Some( LogicalSize::new(  vulkanInstance.Window.GetMaxWidth().unwrap()  , vulkanInstance.Window.GetMaxHeight().unwrap() )));
-	}
-
-	let queue_family = physical.queue_families().find(|&q| {
-		// We take the first queue that supports drawing to our window.
-		q.supports_graphics() && vulkanInstance.Requirements.surface.is_supported(q).unwrap_or(false)
-	}).unwrap();
-
-
-	let device_ext = DeviceExtensions { khr_swapchain: true, .. DeviceExtensions::none() };
-	let (device, mut queues) = Device::new(physical, physical.supported_features(), &device_ext, [(queue_family, 0.5)].iter().cloned()).unwrap();
-	//let (device3, mut queues3) = Device::new(physical, physical.supported_features(), &device_ext, [(queue_family, 0.5)].iter().cloned()).unwrap();
-
-	let queue = queues.next().unwrap();
+	let queue = RGMinst.queues.unwrap().next().unwrap();
+	let physical = PhysicalDevice::enumerate( &RGMinst.Requirements.instance ).next().unwrap();
+	let surface = RGMinst.Requirements.surface.window();
 
 	let ((mut swapchain, images), dimensions) = {
-		let caps = vulkanInstance.Requirements.surface.capabilities(physical).unwrap();
+		let caps = RGMinst.Requirements.surface.capabilities(physical).unwrap();
 		let usage = caps.supported_usage_flags;
 		let alpha = caps.supported_composite_alpha.iter().next().unwrap();
 		let format = caps.supported_formats[0].0;
 
-		let initial_dimensions = if let Some(dimensions) = window.get_inner_size() {
-			let dimensions: (u32, u32) = dimensions.to_physical(window.get_hidpi_factor()).into();// convert to physical pixels
+		let initial_dimensions = if let Some(dimensions) = surface.get_inner_size() {
+			let dimensions: (u32, u32) = dimensions.to_physical(surface.get_hidpi_factor()).into();// convert to physical pixels
 			[dimensions.0, dimensions.1]
 		} else {
 			// The window no longer exists so exit the application.
@@ -466,7 +490,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 		};
 
 		(
-			Swapchain::new( device.clone(), vulkanInstance.Requirements.surface.clone(), caps.min_image_count, format,
+			Swapchain::new( RGMinst.device.clone().unwrap().clone(), RGMinst.Requirements.surface.clone(), caps.min_image_count, format,
 				initial_dimensions, 1, usage, &queue, SurfaceTransform::Identity, alpha,
 				PresentMode::Fifo, true, None, ) .unwrap(),
 			initial_dimensions,
@@ -474,36 +498,12 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 	};
 
 
-	let mut CanvasFigures = Structs::Vertex::CanvasFigures::createCanvasFigures();
 
-	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.0, "RED".to_string(), Structs::Callbacks::CallbackEmun::ADD, String::from("Cuad1"));
-	CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.0, "YELLOW".to_string(), Structs::Callbacks::CallbackEmun::DEL, String::from("Trian1"));
-
-
-
-	let mut CSTMVert = Vec::new();
-	CSTMVert.push(Structs::Vertex::Points { Position: [-1.0,-1.0, 0.0], });
-	CSTMVert.push(Structs::Vertex::Points { Position: [ 1.0,-1.0, 0.0], });
-	CSTMVert.push(Structs::Vertex::Points { Position: [-1.0, 1.0, 0.0], });
-	CSTMVert.push(Structs::Vertex::Points { Position: [ 1.0,-1.0, 0.0], });
-	CSTMVert.push(Structs::Vertex::Points { Position: [-1.0, 1.0, 0.0], });
-	CSTMVert.push(Structs::Vertex::Points { Position: [ 1.0, 1.0, 0.0], });
-	CanvasFigures = Structs::Vertex::CanvasFigures::addCSTMFigure( CanvasFigures, CSTMVert, device.clone(), 0.1, -0.5, 0.0, "PURPLE".to_string(), Structs::Callbacks::CallbackEmun::NON , String::from("CSTMFIG"));
-
-
-	let mut CSTMVert2 = Vec::new();
-	CSTMVert2.push(Structs::Vertex::Points { Position: [-1.0,-1.0, 0.0], });
-	CSTMVert2.push(Structs::Vertex::Points { Position: [ 1.0,-1.0, 0.0], });
-	CSTMVert2.push(Structs::Vertex::Points { Position: [-1.0, 1.0, 0.0], });
-	CanvasFigures = Structs::Vertex::CanvasFigures::addCSTMFigure( CanvasFigures, CSTMVert2, device.clone(), 0.1, -0.5, 0.5, "GREEN".to_string(), Structs::Callbacks::CallbackEmun::NON , String::from("CSTMFIG2"));
-
-
-
-	let vs = Structs::Shaders::vs::Shader::load(device.clone()).unwrap();
-	let fs = Structs::Shaders::fs::Shader::load(device.clone()).unwrap();
+	let vs = Structs::Shaders::vs::Shader::load(RGMinst.device.clone().unwrap().clone()).unwrap();
+	let fs = Structs::Shaders::fs::Shader::load(RGMinst.device.clone().unwrap().clone()).unwrap();
 
 	let render_pass = Arc::new(vulkano::single_pass_renderpass!(
-		device.clone(),
+		RGMinst.device.clone().unwrap().clone(),
 		attachments: {
 			color: {
 				load: Clear,
@@ -535,7 +535,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 			.depth_stencil_simple_depth()
 			.fragment_shader(fs.main_entry_point(), ())
 			.render_pass(Subpass::from(render_pass.clone(), 0).unwrap())
-			.build(device.clone())
+			.build(RGMinst.device.clone().unwrap().clone())
 			.unwrap(),
 	);
 
@@ -548,12 +548,12 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 	let mut dynamic_state = DynamicState { line_width: None, viewports: None, scissors: None };
 
 	//let mut framebuffers = window_size_dependent_setup(&images, render_pass.clone(), &mut dynamic_state);
-	let mut framebuffers = window_size_dependent_setup( device.clone(), &images, render_pass.clone(), &mut dynamic_state, );
+	let mut framebuffers = window_size_dependent_setup( RGMinst.device.clone().unwrap().clone(), &images, render_pass.clone(), &mut dynamic_state, );
 	// Initialization is finally finished!
 
 	let mut recreate_swapchain = false;
 
-	let mut previous_frame_end = Box::new(sync::now(device.clone())) as Box<dyn GpuFuture>;
+	let mut previous_frame_end = Box::new(sync::now(RGMinst.device.clone().unwrap().clone())) as Box<dyn GpuFuture>;
 
 
 
@@ -562,7 +562,6 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 	let mut mouse_y = 0.0;
 	let mut selected_entity = None;
 	let mut clicked_entity = None;
-
 
 
 	let mut done = false;
@@ -576,8 +575,8 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 		previous_frame_end.cleanup_finished();
 
 		if recreate_swapchain {
-			let dimensions = if let Some(dimensions) = window.get_inner_size() {
-				let dimensions: (u32, u32) = dimensions.to_physical(window.get_hidpi_factor()).into();
+			let dimensions = if let Some(dimensions) = surface.get_inner_size() {
+				let dimensions: (u32, u32) = dimensions.to_physical(surface.get_hidpi_factor()).into();
 				[dimensions.0, dimensions.1]
 			} else {
 				return;
@@ -592,7 +591,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 			swapchain = new_swapchain;
 			//framebuffers = window_size_dependent_setup(&new_images, render_pass.clone(), &mut dynamic_state);
 
-			framebuffers = window_size_dependent_setup( device.clone(), &new_images, render_pass.clone(), &mut dynamic_state, );
+			framebuffers = window_size_dependent_setup( RGMinst.device.clone().unwrap().clone(), &new_images, render_pass.clone(), &mut dynamic_state, );
 
 			// RECREATE DRAWTEXT ON RESIZE
 			// draw_text = DrawText::new(device.clone(), queue.clone(), swapchain.clone(), &new_images);
@@ -632,7 +631,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 		let clear_values = vec![[0.0, 0.0, 0.0, 1.0].into(), 1f32.into()];
 
 		let mut command_buffer_builder =
-			AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap()
+			AutoCommandBufferBuilder::primary_one_time_submit(RGMinst.device.clone().unwrap().clone(), queue.family()).unwrap()
 			.begin_render_pass(framebuffers[image_num].clone(), false, clear_values).unwrap();
 
 		/*let command_buffer = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap()
@@ -647,7 +646,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 			.build().unwrap();
 		*/
 
-		for (i, obj) in CanvasFigures.VertArray.iter().enumerate() {
+		for (i, obj) in RGMinst.CanvasFigures.VertArray.iter().enumerate() {
 		// for (i, obj) in objects.iter().enumerate() {
 			let pc = {
 
@@ -703,15 +702,15 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 				if funcionstr == "ADD" {
 					println!("ADD");
 
-					CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( CanvasFigures, Structs::Vertex::Figures::Plane, device.clone(), 0.1, 0.0, 0.5, "CYAN".to_string(), Structs::Callbacks::CallbackEmun::ADD, String::from("Din1"));
-					let DinFigureID = Structs::Vertex::CanvasFigures::getFigureID(CanvasFigures.clone() , "Din1".to_string());
+					RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( RGMinst.CanvasFigures, Structs::Vertex::Figures::Plane, RGMinst.device.clone().unwrap().clone(), 0.1, 0.0, 0.5, "CYAN".to_string(), Structs::Callbacks::CallbackEmun::ADD, String::from("Din1"));
+					let DinFigureID = Structs::Vertex::CanvasFigures::getFigureID(RGMinst.CanvasFigures.clone() , "Din1".to_string());
 					println!("El ID de la figura generada es:{:?}", DinFigureID);
-					println!("El Color de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureColor(CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureCallback(CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la VertexBase generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureVertexBase(CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la Multiplier generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureMultiplier(CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la XMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureXMovement(CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la YMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureYMovement(CanvasFigures.clone() , DinFigureID));
+					println!("El Color de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureColor(RGMinst.CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureCallback(RGMinst.CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la VertexBase generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureVertexBase(RGMinst.CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la Multiplier generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureMultiplier(RGMinst.CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la XMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureXMovement(RGMinst.CanvasFigures.clone() , DinFigureID));
+					println!("El callback de la YMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureYMovement(RGMinst.CanvasFigures.clone() , DinFigureID));
 
 					// CanvasFigures = Structs::Vertex::CanvasFigures::changefigureColor(CanvasFigures.clone(), device.clone(), "BlUE".to_string(), 0 );
 
@@ -720,7 +719,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 					// objects = DinamicAddFigures(&objects.clone(), &CanvasFiguresADD );
 				}
 				else if funcionstr == "DEL" {
-					CanvasFigures = Structs::Vertex::CanvasFigures::delFigure( CanvasFigures, 2);
+					RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::delFigure( RGMinst.CanvasFigures, 2);
 					//objects = DinamicDelFigure(&objects.clone(), 2 );
 				}
 				else if funcionstr == "MOD" {
@@ -755,24 +754,25 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 			}
 			Err(FlushError::OutOfDate) => {
 				recreate_swapchain = true;
-				previous_frame_end = Box::new(sync::now(device.clone())) as Box<_>;
+				previous_frame_end = Box::new(sync::now(RGMinst.device.clone().unwrap().clone())) as Box<_>;
 			}
 			Err(e) => {
 				println!("{:?}", e);
-				previous_frame_end = Box::new(sync::now(device.clone())) as Box<_>;
+				previous_frame_end = Box::new(sync::now(RGMinst.device.clone().unwrap().clone())) as Box<_>;
 			}
 		}
 		/*
-		let mut Event = &Arc::new(&vulkanInstance.Requirements.events_loop);
-		//&Arc::new( vulkanInstance.Window.GetWindowTitle())
+		let mut Event = &Arc::new(&RGMinst.Requirements.events_loop);
+		//&Arc::new( RGMinst.Window.GetWindowTitle())
 		**Event.poll_events(|event| {
  		*/
 
-		let VulkanoSurfaceClone = vulkanInstance.Requirements.surface.clone();
-		let VulkanoWindowClone = vulkanInstance.Window.clone();
+		let VulkanoSurfaceClone = RGMinst.Requirements.surface.clone();
+		let VulkanoWindowClone = RGMinst.Window.clone();
+		let CanvasFigures = RGMinst.CanvasFigures.clone();
 
 
-		&vulkanInstance.Requirements.events_loop.poll_events(|event| {
+		&RGMinst.Requirements.events_loop.poll_events(|event| {
 		//events_loop.poll_events(|ev| {
 			//println!("Eventos: \"{:?}\"", ev);
 			//Motion { axis: 0, value: -4.0 }  (pantalla creo)
@@ -862,7 +862,7 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 				},*/
 				Event::WindowEvent { event: WindowEvent::Moved ( _delta ), ..} => {
 					// println!("Se movio la entana \"{:?}\"", 3);
-					window.set_cursor(cursors[cursor_idx]);
+					surface.set_cursor(cursors[cursor_idx]);
 					if cursor_idx < cursors.len() - 1 {
 						cursor_idx += 1;
 					} /*else {
@@ -899,9 +899,9 @@ pub fn UseRustyInstance(WindowStruct : Structs::RGMWindow) {
 							}
 						}
 						winit::VirtualKeyCode::Space => {
-							//&vulkanInstance.Window.SetResizable( Some( !&vulkanInstance.Window.GetResizable().unwrap()) );
-							//VulkanoWindowClone.SetResizable( Some( !&vulkanInstance.Window.GetResizable().unwrap()) );
-							//window.set_resizable( vulkanInstance.Window.GetResizable().unwrap() );
+							//&RGMinst.Window.SetResizable( Some( !&RGMinst.Window.GetResizable().unwrap()) );
+							//VulkanoWindowClone.SetResizable( Some( !&RGMinst.Window.GetResizable().unwrap()) );
+							//window.set_resizable( RGMinst.Window.GetResizable().unwrap() );
 						}
 						Escape => {
 							println!("Le picaste Escape");
