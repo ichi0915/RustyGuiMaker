@@ -32,7 +32,7 @@ use winit::{EventsLoop, Window, WindowBuilder, Event, WindowEvent, Icon, Keyboar
 // use std::time::Duration;
 
 // IMPORT
-//use vulkano_text::{DrawText, DrawTextTrait};
+use vulkano_text::{DrawText, DrawTextTrait};
 // IMPORT END
 
 //las 2 siguientes y la de Icon para icons
@@ -83,7 +83,7 @@ use std::iter;
 
 
 // let mut Figures = Structs::Vertex::Figures::addFigure();
-//controles 
+//controles
 //cola de mensajes - a los callbacks
 //hit test el clikeado, va desde adelante hasta atras para ver si le pico a alguien hasta ke true
 
@@ -431,8 +431,10 @@ pub fn StartRustyInstance(mut RGMinst : Structs::RGMinstance)-> Structs::RGMinst
 	let device_ext = DeviceExtensions { khr_swapchain: true, .. DeviceExtensions::none() };
 	let (device, mut queues) = Device::new(physical, physical.supported_features(), &device_ext, [(queue_family, 0.5)].iter().cloned()).unwrap();
 
+
 	RGMinst.Setdevice( Some(device) );
 	RGMinst.Setqueues( Some(queues) );
+
 
 	//RGMinst.Setsurface(surface);
 
@@ -457,7 +459,17 @@ pub fn ADDCSTMFigRustyInstance(mut RGMinst : Structs::RGMinstance, lcVertexBase:
 
 
 
-pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado original
+//pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) -> Structs::RGMinstance {
+pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
+
+	let mut last_pressed = 'f';
+
+	fn getLastButtonPressed(last_pressedI : char)->char{
+		let last_pressedF = last_pressedI.clone();
+		println!("Pressed key {}", last_pressedF );
+		return last_pressedF;
+	}
+
 
 	let s = "world!".to_string();
 
@@ -471,7 +483,8 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado origina
 	};
 
 
-	let queue = RGMinst.queues.unwrap().next().unwrap();
+
+	let queue = RGMinst.queues.unwrap().next().unwrap().clone();
 	let physical = PhysicalDevice::enumerate( &RGMinst.Requirements.instance ).next().unwrap();
 	let surface = RGMinst.Requirements.surface.window();
 
@@ -486,7 +499,8 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado origina
 			[dimensions.0, dimensions.1]
 		} else {
 			// The window no longer exists so exit the application.
-			return;
+			return ;
+			//return RGMinst;
 		};
 
 		(
@@ -496,6 +510,10 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado origina
 			initial_dimensions,
 		)
 	};
+
+	let mut draw_text = DrawText::new(RGMinst.device.clone().unwrap().clone(), queue.clone(), swapchain.clone(), &images);
+	//RGMinst.SetText( Some(draw_text) );
+	// RGMinst.SetText( Some(RGMinst, draw_text) );
 
 
 
@@ -567,203 +585,209 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado origina
 	//variantes del cursor
 	let cursors = [MouseCursor::Default, MouseCursor::Crosshair, MouseCursor::Hand, MouseCursor::Arrow, MouseCursor::Move, MouseCursor::Text, MouseCursor::Wait, MouseCursor::Help, MouseCursor::Progress, MouseCursor::NotAllowed, MouseCursor::ContextMenu,/* MouseCursor::NoneCursor, */MouseCursor::Cell, MouseCursor::VerticalText, MouseCursor::Alias, MouseCursor::Copy, MouseCursor::NoDrop, MouseCursor::Grab, MouseCursor::Grabbing, MouseCursor::AllScroll, MouseCursor::ZoomIn, MouseCursor::ZoomOut, MouseCursor::EResize, MouseCursor::NResize, MouseCursor::NeResize, MouseCursor::NwResize, MouseCursor::SResize, MouseCursor::SeResize, MouseCursor::SwResize, MouseCursor::WResize, MouseCursor::EwResize, MouseCursor::NsResize, MouseCursor::NeswResize, MouseCursor::NwseResize, MouseCursor::ColResize, MouseCursor::RowResize];
 	let mut cursor_idx = 0;
+	let mut minimised = false;
 
 	loop {
-		previous_frame_end.cleanup_finished();
 
-		if recreate_swapchain {
-			let dimensions = if let Some(dimensions) = surface.get_inner_size() {
-				let dimensions: (u32, u32) = dimensions.to_physical(surface.get_hidpi_factor()).into();
-				[dimensions.0, dimensions.1]
-			} else {
-				return;
-			};
+		if minimised == false {
 
-			let (new_swapchain, new_images) = match swapchain.recreate_with_dimension(dimensions) {
+			previous_frame_end.cleanup_finished();
+
+			if recreate_swapchain {
+				let dimensions = if let Some(dimensions) = surface.get_inner_size() {
+					let dimensions: (u32, u32) = dimensions.to_physical(surface.get_hidpi_factor()).into();
+					[dimensions.0, dimensions.1]
+				} else {
+					return;
+					//return RGMinst;
+				};
+
+				let (new_swapchain, new_images) = match swapchain.recreate_with_dimension(dimensions) {
+					Ok(r) => r,
+					Err(SwapchainCreationError::UnsupportedDimensions) => continue,
+					//Err(SwapchainCreationError::UnsupportedDimensions) => return RGMinst,
+					Err(err) => panic!("{:?}", err)
+				};
+
+				swapchain = new_swapchain;
+				//framebuffers = window_size_dependent_setup(&new_images, render_pass.clone(), &mut dynamic_state);
+
+				framebuffers = window_size_dependent_setup( RGMinst.device.clone().unwrap().clone(), &new_images, render_pass.clone(), &mut dynamic_state, );
+
+				// RECREATE DRAWTEXT ON RESIZE
+				// draw_text = DrawText::new(device.clone(), queue.clone(), swapchain.clone(), &new_images);
+				// RECREATE DRAWTEXT ON RESIZE END
+
+				recreate_swapchain = false;
+			}
+
+
+			// SPECIFY TEXT TO DRAW
+			// if x > width as f32 {
+			//     x = 0.0;
+			// }
+			// else {
+			//     x += 0.4;
+			// }
+
+			// draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "hola dariog.");
+			// draw_text.queue_text(20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], "Hello world!");
+			// draw_text.queue_text(x, 350.0, 70.0, [0.51, 0.6, 0.74, 1.0], "Ichi: ( ͡° ͜ʖ ͡°)");
+			// draw_text.queue_text(50.0, 350.0, 70.0, [1.0, 1.0, 1.0, 1.0], "Overlappp");
+			// SPECIFY TEXT TO DRAW END
+
+
+			let (image_num, acquire_future) = match swapchain::acquire_next_image(swapchain.clone(), None) {
 				Ok(r) => r,
-				Err(SwapchainCreationError::UnsupportedDimensions) => continue,
+				Err(AcquireError::OutOfDate) => {
+					recreate_swapchain = true;
+					continue;
+					//return RGMinst;
+				},
 				Err(err) => panic!("{:?}", err)
 			};
 
-			swapchain = new_swapchain;
-			//framebuffers = window_size_dependent_setup(&new_images, render_pass.clone(), &mut dynamic_state);
+			//let clear_values = vec!([1.0, 1.0, 1.0, 1.0].into());
 
-			framebuffers = window_size_dependent_setup( RGMinst.device.clone().unwrap().clone(), &new_images, render_pass.clone(), &mut dynamic_state, );
+			// Specify the color to clear the framebuffer with i.e. blue
+			let clear_values = vec![[0.0, 0.0, 0.0, 1.0].into(), 1f32.into()];
 
-			// RECREATE DRAWTEXT ON RESIZE
-			// draw_text = DrawText::new(device.clone(), queue.clone(), swapchain.clone(), &new_images);
-			// RECREATE DRAWTEXT ON RESIZE END
+			let mut command_buffer_builder =
+				AutoCommandBufferBuilder::primary_one_time_submit(RGMinst.device.clone().unwrap().clone(), queue.family()).unwrap()
+				.begin_render_pass(framebuffers[image_num].clone(), false, clear_values).unwrap();
 
-			recreate_swapchain = false;
-		}
+			/*let command_buffer = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap()
+				.begin_render_pass(framebuffers[image_num].clone(), false, clear_values)
+				.unwrap()
+				.draw(pipeline.clone(), &dynamic_state, vertex_Pixel.clone(), (), ()).unwrap()
+				.end_render_pass()
+				.unwrap()
+				// DRAW THE TEXT
+				// .draw_text(&mut draw_text, image_num)
+				// DRAW THE TEXT END
+				.build().unwrap();
+			*/
 
+			for (i, obj) in RGMinst.CanvasFigures.VertArray.iter().enumerate() {
+			// for (i, obj) in objects.iter().enumerate() {
+				let pc = {
 
-		// SPECIFY TEXT TO DRAW
-		// if x > width as f32 {
-		//     x = 0.0;
-		// }
-		// else {
-		//     x += 0.4;
-		// }
+					if let Some(clicked_idx) = clicked_entity {
+						if clicked_idx == i {
+							println!("Le picaste a {}", clicked_idx);
 
-		// draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "hola dariog.");
-		// draw_text.queue_text(20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], "Hello world!");
-		// draw_text.queue_text(x, 350.0, 70.0, [0.51, 0.6, 0.74, 1.0], "Ichi: ( ͡° ͜ʖ ͡°)");
-		// draw_text.queue_text(50.0, 350.0, 70.0, [1.0, 1.0, 1.0, 1.0], "Overlappp");
-		// SPECIFY TEXT TO DRAW END
+							if clicked_idx == 0{
+								// println!("00000000000000000 {:?}", CanvasFigures.callback[clicked_idx]);
+								// let lol =  CanvasFigures.callback[clicked_idx].clone();
+								// p.process_events( CanvasFigures.callback[clicked_idx].clone() );
+								// let funcionstr =  Structs::Callbacks::CallbackEmun::as_str( &CanvasFigures.callback[clicked_idx].clone());
+								p.process_events( Structs::Callbacks::CallbackEmun::ADD );
+							}
+							else if clicked_idx == 1{
+								// println!("1111111111111111 {:?}", CanvasFigures.callback[clicked_idx]);
+								p.process_events( Structs::Callbacks::CallbackEmun::DEL );
+							}
 
-
-		let (image_num, acquire_future) = match swapchain::acquire_next_image(swapchain.clone(), None) {
-			Ok(r) => r,
-			Err(AcquireError::OutOfDate) => {
-				recreate_swapchain = true;
-				continue;
-			},
-			Err(err) => panic!("{:?}", err)
-		};
-
-		//let clear_values = vec!([1.0, 1.0, 1.0, 1.0].into());
-
-		  // Specify the color to clear the framebuffer with i.e. blue
-		let clear_values = vec![[0.0, 0.0, 0.0, 1.0].into(), 1f32.into()];
-
-		let mut command_buffer_builder =
-			AutoCommandBufferBuilder::primary_one_time_submit(RGMinst.device.clone().unwrap().clone(), queue.family()).unwrap()
-			.begin_render_pass(framebuffers[image_num].clone(), false, clear_values).unwrap();
-
-		/*let command_buffer = AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family()).unwrap()
-			.begin_render_pass(framebuffers[image_num].clone(), false, clear_values)
-			.unwrap()
-			.draw(pipeline.clone(), &dynamic_state, vertex_Pixel.clone(), (), ()).unwrap()
-			.end_render_pass()
-			.unwrap()
-			// DRAW THE TEXT
-			// .draw_text(&mut draw_text, image_num)
-			// DRAW THE TEXT END
-			.build().unwrap();
-		*/
-
-		for (i, obj) in RGMinst.CanvasFigures.VertArray.iter().enumerate() {
-		// for (i, obj) in objects.iter().enumerate() {
-			let pc = {
-
-				if let Some(clicked_idx) = clicked_entity {
-					if clicked_idx == i {
-						println!("Le picaste a {}", clicked_idx);
-
-						if clicked_idx == 0{
-							// println!("00000000000000000 {:?}", CanvasFigures.callback[clicked_idx]);
-							// let lol =  CanvasFigures.callback[clicked_idx].clone();
-							// p.process_events( CanvasFigures.callback[clicked_idx].clone() );
-							// let funcionstr =  Structs::Callbacks::CallbackEmun::as_str( &CanvasFigures.callback[clicked_idx].clone());
-							p.process_events( Structs::Callbacks::CallbackEmun::ADD );
+							clicked_entity = None;
+						} else {
 						}
-						else if clicked_idx == 1{
-							// println!("1111111111111111 {:?}", CanvasFigures.callback[clicked_idx]);
-							p.process_events( Structs::Callbacks::CallbackEmun::DEL );
-						}
-
-						clicked_entity = None;
-					} else {
+					} else{
 					}
-				} else{
-				}
 
 
-				if let Some(selected_idx) = selected_entity {
-					if selected_idx == i {
-						// println!("Le picaste a {}", selected_idx);
-						Structs::Shaders::fs::ty::PushConstants { isSelected: 1, Clicked: 1 }
+					if let Some(selected_idx) = selected_entity {
+						if selected_idx == i {
+							// println!("Le picaste a {}", selected_idx);
+							Structs::Shaders::fs::ty::PushConstants { isSelected: 1, Clicked: 1 }
+						} else {
+							Structs::Shaders::fs::ty::PushConstants { isSelected: 0, Clicked: 0 }
+						}
 					} else {
 						Structs::Shaders::fs::ty::PushConstants { isSelected: 0, Clicked: 0 }
 					}
-				} else {
-					Structs::Shaders::fs::ty::PushConstants { isSelected: 0, Clicked: 0 }
+				};
+				command_buffer_builder = command_buffer_builder
+					.draw(pipeline.clone(), &dynamic_state, obj.clone(), (), pc)
+					.unwrap();
+			}
+
+			// p.PrintQueue();
+
+			let Queue = p.GetQueue();
+
+			for d in &mut Queue.clone() {
+				if let Some(ref mut du) = *d {
+					println!(" Realizando: {:?}", du);
+
+					let funcionstr = Structs::Callbacks::CallbackEmun::as_str(&du.clone());
+
+					if funcionstr == "ADD" {
+						println!("ADD");
+
+						RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( RGMinst.CanvasFigures, Structs::Vertex::Figures::Plane, RGMinst.device.clone().unwrap().clone(), 0.1, 0.0, 0.5, "CYAN".to_string(), Structs::Callbacks::CallbackEmun::ADD, String::from("Din1"));
+						let DinFigureID = Structs::Vertex::CanvasFigures::getFigureID(RGMinst.CanvasFigures.clone() , "Din1".to_string());
+						println!("El ID de la figura generada es:{:?}", DinFigureID);
+						println!("El Color de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureColor(RGMinst.CanvasFigures.clone() , DinFigureID));
+						println!("El callback de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureCallback(RGMinst.CanvasFigures.clone() , DinFigureID));
+						println!("El callback de la VertexBase generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureVertexBase(RGMinst.CanvasFigures.clone() , DinFigureID));
+						println!("El callback de la Multiplier generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureMultiplier(RGMinst.CanvasFigures.clone() , DinFigureID));
+						println!("El callback de la XMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureXMovement(RGMinst.CanvasFigures.clone() , DinFigureID));
+						println!("El callback de la YMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureYMovement(RGMinst.CanvasFigures.clone() , DinFigureID));
+
+						// CanvasFigures = Structs::Vertex::CanvasFigures::changefigureColor(CanvasFigures.clone(), device.clone(), "BlUE".to_string(), 0 );
+
+						// let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
+						// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));
+						// objects = DinamicAddFigures(&objects.clone(), &CanvasFiguresADD );
+					}
+					else if funcionstr == "DEL" {
+						RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::delFigure( RGMinst.CanvasFigures, 2);
+						//objects = DinamicDelFigure(&objects.clone(), 2 );
+					}
+					else if funcionstr == "MOD" {
+						println!("MOD");
+					}
+					else if funcionstr == "CSM" {
+						println!("CSTM");
+					}
+					else{
+						println!("Funcion no reconocida");
+					}
 				}
-			};
-			command_buffer_builder = command_buffer_builder
-				.draw(pipeline.clone(), &dynamic_state, obj.clone(), (), pc)
-				.unwrap();
+			}
+			p.CleanQueue();
+
+			// p.DoQueue();
+
+
+			// Finish building the command buffer by calling `build`.
+			let command_buffer = command_buffer_builder.end_render_pass().unwrap().build().unwrap();
+
+
+			let future = previous_frame_end.join(acquire_future)
+				.then_execute(queue.clone(), command_buffer).unwrap()
+				.then_swapchain_present(queue.clone(), swapchain.clone(), image_num)
+				.then_signal_fence_and_flush();
+
+			match future {
+				Ok(future) => {
+					previous_frame_end = Box::new(future) as Box<_>;
+				}
+				Err(FlushError::OutOfDate) => {
+					recreate_swapchain = true;
+					previous_frame_end = Box::new(sync::now(RGMinst.device.clone().unwrap().clone())) as Box<_>;
+				}
+				Err(e) => {
+					println!("{:?}", e);
+					previous_frame_end = Box::new(sync::now(RGMinst.device.clone().unwrap().clone())) as Box<_>;
+				}
+			}
+			/*
+			let mut Event = &Arc::new(&RGMinst.Requirements.events_loop);
+			//&Arc::new( RGMinst.Window.GetWindowTitle())
+			**Event.poll_events(|event| {
+			*/
 		}
-
-		// p.PrintQueue();
-
-		let Queue = p.GetQueue();
-
-		for d in &mut Queue.clone() {
-			if let Some(ref mut du) = *d {
-				println!(" Realizando: {:?}", du);
-
-				let funcionstr = Structs::Callbacks::CallbackEmun::as_str(&du.clone());
-
-				if funcionstr == "ADD" {
-					println!("ADD");
-
-					RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::addFigure( RGMinst.CanvasFigures, Structs::Vertex::Figures::Plane, RGMinst.device.clone().unwrap().clone(), 0.1, 0.0, 0.5, "CYAN".to_string(), Structs::Callbacks::CallbackEmun::ADD, String::from("Din1"));
-					let DinFigureID = Structs::Vertex::CanvasFigures::getFigureID(RGMinst.CanvasFigures.clone() , "Din1".to_string());
-					println!("El ID de la figura generada es:{:?}", DinFigureID);
-					println!("El Color de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureColor(RGMinst.CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la figura generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureCallback(RGMinst.CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la VertexBase generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureVertexBase(RGMinst.CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la Multiplier generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureMultiplier(RGMinst.CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la XMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureXMovement(RGMinst.CanvasFigures.clone() , DinFigureID));
-					println!("El callback de la YMovement generada es:{:?}", Structs::Vertex::CanvasFigures::getFigureYMovement(RGMinst.CanvasFigures.clone() , DinFigureID));
-
-					// CanvasFigures = Structs::Vertex::CanvasFigures::changefigureColor(CanvasFigures.clone(), device.clone(), "BlUE".to_string(), 0 );
-
-					// let mut CanvasFiguresADD = Structs::Vertex::CanvasFigures::createCanvasFigures();
-					// CanvasFiguresADD = Structs::Vertex::CanvasFigures::addFigure( CanvasFiguresADD, Structs::Vertex::Figures::Triangle, device.clone(), 0.1, 0.5, 0.5, String::from("DEL"));
-					// objects = DinamicAddFigures(&objects.clone(), &CanvasFiguresADD );
-				}
-				else if funcionstr == "DEL" {
-					RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::delFigure( RGMinst.CanvasFigures, 2);
-					//objects = DinamicDelFigure(&objects.clone(), 2 );
-				}
-				else if funcionstr == "MOD" {
-					println!("MOD");
-				}
-				else if funcionstr == "CSM" {
-					println!("CSTM");
-				}
-				else{
-					println!("Funcion no reconocida");
-				}
-			}
-		}
-		p.CleanQueue();
-
-		// p.DoQueue();
-
-
-		// Finish building the command buffer by calling `build`.
-		let command_buffer = command_buffer_builder.end_render_pass().unwrap().build().unwrap();
-
-
-		let future = previous_frame_end.join(acquire_future)
-			.then_execute(queue.clone(), command_buffer).unwrap()
-
-			.then_swapchain_present(queue.clone(), swapchain.clone(), image_num)
-			.then_signal_fence_and_flush();
-
-		match future {
-			Ok(future) => {
-				previous_frame_end = Box::new(future) as Box<_>;
-			}
-			Err(FlushError::OutOfDate) => {
-				recreate_swapchain = true;
-				previous_frame_end = Box::new(sync::now(RGMinst.device.clone().unwrap().clone())) as Box<_>;
-			}
-			Err(e) => {
-				println!("{:?}", e);
-				previous_frame_end = Box::new(sync::now(RGMinst.device.clone().unwrap().clone())) as Box<_>;
-			}
-		}
-		/*
-		let mut Event = &Arc::new(&RGMinst.Requirements.events_loop);
-		//&Arc::new( RGMinst.Window.GetWindowTitle())
-		**Event.poll_events(|event| {
- 		*/
-
 		let VulkanoSurfaceClone = RGMinst.Requirements.surface.clone();
 		let VulkanoWindowClone = RGMinst.Window.clone();
 		let CanvasFigures = RGMinst.CanvasFigures.clone();
@@ -774,7 +798,7 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado origina
 			//println!("Eventos: \"{:?}\"", ev);
 			//Motion { axis: 0, value: -4.0 }  (pantalla creo)
 			//MouseMotion { delta: (-4.0, 10.0) }
-			//CursorMoved { device_id: DeviceId(DeviceId(0)), position: LogicalPosition { x: 461.0, y: 474.0 }, modifiers: ModifiersState { shift: false, ctrl: false, alt: false, logo: false } } 
+			//CursorMoved { device_id: DeviceId(DeviceId(0)), position: LogicalPosition { x: 461.0, y: 474.0 }, modifiers: ModifiersState { shift: false, ctrl: false, alt: false, logo: false } }
 			//CursorEntered { device_id: DeviceId(DeviceId(0)) }
 			//CursorLeft { device_id: DeviceId(DeviceId(0)) }
 			//Button { button: 1, state: Released }
@@ -801,13 +825,54 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado origina
 
 		match event {
 				//Event::WindowEvent { event: WindowEvent::CloseRequested, .. } => done = true,
-				Event::WindowEvent { event: WindowEvent::Resized(_), .. } => recreate_swapchain = true,
+
+				//Event::WindowEvent { event: WindowEvent::Resized(_), .. } => recreate_swapchain = true,
+
+				//This section checks if the window is resize if it is too small to paint it stop the swapchain, if not it crashes
+				Event::WindowEvent { event: WindowEvent::Resized(_), .. } =>{
+					//let dimensions2 = if let Some(dimensions2) = surface.get_inner_size() {
+					if let Some(dimensions2) = surface.get_inner_size() {
+						let dimensions2: (u32, u32) = dimensions2.to_physical(surface.get_hidpi_factor()).into();
+						[dimensions2.0, dimensions2.1];
+						if dimensions2.0 < 1 || dimensions2.1 < 1 {
+							recreate_swapchain = false;
+							minimised = true;
+						}else{
+							recreate_swapchain = true;
+							minimised = false;
+						}
+						println!("x: {} , y : {}",dimensions2.0,dimensions2.1);
+					}else{
+						recreate_swapchain = false;
+					};
+				} ,
+
 				//Event::WindowEvent { event: WindowEvent::KeyboardInput , .. } => recreate_swapchain = true,
 				Event::WindowEvent { event: WindowEvent::ReceivedCharacter('w') , .. } => {
-					println!("le picaste a la W");
-					
+					//println!("le picaste a la W");
+					last_pressed = getLastButtonPressed('w');
+				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('a') , .. } => {
+					//println!("le picaste a la A");
+					last_pressed = getLastButtonPressed('a');
+				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('s') , .. } => {
+					//println!("le picaste a la S");
+					last_pressed = getLastButtonPressed('s');
+				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('d') , .. } => {
+					//println!("le picaste a la D");
+					last_pressed = getLastButtonPressed('d');
+				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('W') , .. } => {
+					//println!("le picaste a la W");
+					last_pressed = getLastButtonPressed('w');
+				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('A') , .. } => {
+					//println!("le picaste a la A");
+					last_pressed = getLastButtonPressed('a');
+				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('S') , .. } => {
+					//println!("le picaste a la S");
+					last_pressed = getLastButtonPressed('s');
+				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('D') , .. } => {
+					//println!("le picaste a la D");
+					last_pressed = getLastButtonPressed('d');
 				},
-
 
 				// position: LogicalPosition,
 				//LogicalPosition { x: 978.0, y: 139.0 }
@@ -912,7 +977,9 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {	//amarrado origina
 		});//end events_loop
 
 		if done { return; }
+		//if done { return RGMinst; }
 	}
+	//return RGMinst;
 }
 
 

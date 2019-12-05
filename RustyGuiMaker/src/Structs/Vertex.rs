@@ -152,7 +152,7 @@ impl TrianguloEquilatero {
 
 		let mut Vert = Vec::new();
 
-		Vert.push(VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), });
+		Vert.push( VertexBase { position: [-1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), });
 		Vert.push( VertexBase { position: [ 1.0 * Multiplier + XMovement,  1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), });
 		Vert.push( VertexBase { position: [ 0.0 * Multiplier + XMovement, -1.0 * Multiplier + YMovement, 0.0], color: crate::Structs::Colors::Color::SetColor(Color.clone()), });
 
