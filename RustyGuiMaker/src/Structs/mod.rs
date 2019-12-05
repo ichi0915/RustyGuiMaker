@@ -341,7 +341,7 @@ impl RGMinstance {
 	pub fn SetText2(&mut self, RGMinst: RGMinstance, Text: Option<vulkano_text::DrawText>) -> Self {
 
 		let Window = RGMinst.Window;
-		let Requirements = RGMRequirements::initialize();
+		let Requirements = RGMinst.Requirements;
 
 		let CanvasFigures = RGMinst.CanvasFigures;
 		let queues = RGMinst.queues;
@@ -361,6 +361,13 @@ impl RGMinstance {
 	}
 	pub fn Setsurface(&mut self, surface: RGMRequirements ) {
 		//self.queues = queues;
+	}
+
+	pub fn getRequirements( RGMinst: RGMinstance) -> RGMRequirements {
+		return RGMinst.Requirements;
+	}
+	pub fn getqueue( RGMinst: RGMinstance) -> Option<vulkano::device::QueuesIter> {
+		return RGMinst.queues;
 	}
 
 }

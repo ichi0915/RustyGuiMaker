@@ -458,6 +458,19 @@ pub fn ADDCSTMFigRustyInstance(mut RGMinst : Structs::RGMinstance, lcVertexBase:
 
 
 
+pub fn SetText3(mut RGMinst: Structs::RGMinstance, Text: Option<vulkano_text::DrawText>) -> Structs::RGMinstance {
+
+	/*RGMinst.Window = RGMinst.Window;
+	RGMinst.Requirements = RGMinst.Requirements;
+
+	RGMinst.CanvasFigures = RGMinst.CanvasFigures;
+	RGMinst.queues = RGMinst.queues;
+	RGMinst.device = RGMinst.device;*/
+	RGMinst.Text = Text;
+
+	return RGMinst;
+}
+
 
 //pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) -> Structs::RGMinstance {
 pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
@@ -511,9 +524,10 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 		)
 	};
 
-	let mut draw_text = DrawText::new(RGMinst.device.clone().unwrap().clone(), queue.clone(), swapchain.clone(), &images);
+	//let mut draw_text = DrawText::new(RGMinst.device.clone().unwrap().clone(), queue.clone(), swapchain.clone(), &images);
 	//RGMinst.SetText( Some(draw_text) );
 	// RGMinst.SetText( Some(RGMinst, draw_text) );
+	//RGMinst = SetText3( RGMinst, Some(draw_text) );
 
 
 
@@ -559,8 +573,11 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 
 	// CREATE DRAWTEXT
 	// let mut draw_text = DrawText::new(device.clone(), queue.clone(), swapchain.clone(), &images);
-	// let (width, _): (u32, u32) = surface.window().get_inner_size().unwrap().into();
-	// let mut x = -200.0;
+	let mut draw_text = DrawText::new(RGMinst.device.clone().unwrap().clone(), queue.clone(), swapchain.clone(), &images);
+
+	//las siguientes es para la animacion
+	//let (width, _): (u32, u32) = RGMinst.Requirements.surface.window().get_inner_size().unwrap().into();
+	//let mut x = -200.0;
 	// CREATE DRAWTEXT END
 
 	let mut dynamic_state = DynamicState { line_width: None, viewports: None, scissors: None };
@@ -616,6 +633,7 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 
 				// RECREATE DRAWTEXT ON RESIZE
 				// draw_text = DrawText::new(device.clone(), queue.clone(), swapchain.clone(), &new_images);
+				draw_text = DrawText::new(RGMinst.device.clone().unwrap().clone(), queue.clone(), swapchain.clone(), &new_images);
 				// RECREATE DRAWTEXT ON RESIZE END
 
 				recreate_swapchain = false;
@@ -630,7 +648,7 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 			//     x += 0.4;
 			// }
 
-			// draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "hola dariog.");
+			draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "hola dariog.");
 			// draw_text.queue_text(20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], "Hello world!");
 			// draw_text.queue_text(x, 350.0, 70.0, [0.51, 0.6, 0.74, 1.0], "Ichi: ( ͡° ͜ʖ ͡°)");
 			// draw_text.queue_text(50.0, 350.0, 70.0, [1.0, 1.0, 1.0, 1.0], "Overlappp");
@@ -761,7 +779,10 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 
 
 			// Finish building the command buffer by calling `build`.
-			let command_buffer = command_buffer_builder.end_render_pass().unwrap().build().unwrap();
+			let command_buffer = command_buffer_builder.end_render_pass().unwrap()
+			//la siguiente linea es para dibujar texto pero crashea
+			.draw_text(&mut draw_text, image_num)
+			.build().unwrap();
 
 
 			let future = previous_frame_end.join(acquire_future)
