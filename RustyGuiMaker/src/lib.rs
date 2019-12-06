@@ -598,6 +598,7 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 
 	let mut done = false;
 	let mut ExitRequest = false;
+	let mut TextTest = "Inactivo, picale a wasd";
 
 	//variantes del cursor
 	let cursors = [MouseCursor::Default, MouseCursor::Crosshair, MouseCursor::Hand, MouseCursor::Arrow, MouseCursor::Move, MouseCursor::Text, MouseCursor::Wait, MouseCursor::Help, MouseCursor::Progress, MouseCursor::NotAllowed, MouseCursor::ContextMenu,/* MouseCursor::NoneCursor, */MouseCursor::Cell, MouseCursor::VerticalText, MouseCursor::Alias, MouseCursor::Copy, MouseCursor::NoDrop, MouseCursor::Grab, MouseCursor::Grabbing, MouseCursor::AllScroll, MouseCursor::ZoomIn, MouseCursor::ZoomOut, MouseCursor::EResize, MouseCursor::NResize, MouseCursor::NeResize, MouseCursor::NwResize, MouseCursor::SResize, MouseCursor::SeResize, MouseCursor::SwResize, MouseCursor::WResize, MouseCursor::EwResize, MouseCursor::NsResize, MouseCursor::NeswResize, MouseCursor::NwseResize, MouseCursor::ColResize, MouseCursor::RowResize];
@@ -648,7 +649,7 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 			//     x += 0.4;
 			// }
 
-			draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "hola dariog.");
+			draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], TextTest);
 			// draw_text.queue_text(20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], "Hello world!");
 			// draw_text.queue_text(x, 350.0, 70.0, [0.51, 0.6, 0.74, 1.0], "Ichi: ( ͡° ͜ʖ ͡°)");
 			// draw_text.queue_text(50.0, 350.0, 70.0, [1.0, 1.0, 1.0, 1.0], "Overlappp");
@@ -862,7 +863,7 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 							recreate_swapchain = true;
 							minimised = false;
 						}
-						println!("x: {} , y : {}",dimensions2.0,dimensions2.1);
+						println!("x: {} , y : {}", dimensions2.0, dimensions2.1);
 					}else{
 						recreate_swapchain = false;
 					};
@@ -871,15 +872,19 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 				//Event::WindowEvent { event: WindowEvent::KeyboardInput , .. } => recreate_swapchain = true,
 				Event::WindowEvent { event: WindowEvent::ReceivedCharacter('w') , .. } => {
 					//println!("le picaste a la W");
+					TextTest = "w";
 					last_pressed = getLastButtonPressed('w');
 				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('a') , .. } => {
 					//println!("le picaste a la A");
+					TextTest = "a";
 					last_pressed = getLastButtonPressed('a');
 				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('s') , .. } => {
 					//println!("le picaste a la S");
+					TextTest = "s";
 					last_pressed = getLastButtonPressed('s');
 				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('d') , .. } => {
 					//println!("le picaste a la D");
+					TextTest = "d";
 					last_pressed = getLastButtonPressed('d');
 				}Event::WindowEvent { event: WindowEvent::ReceivedCharacter('W') , .. } => {
 					//println!("le picaste a la W");
@@ -958,6 +963,7 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 					CloseRequested => {
 						println!("Are you ready to bid your window farewell? [Y/N]");
 						ExitRequest = true;
+						TextTest = "No me cierres";
 					}
 					KeyboardInput {
 						input:
