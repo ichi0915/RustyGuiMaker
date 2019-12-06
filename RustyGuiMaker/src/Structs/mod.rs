@@ -91,6 +91,7 @@ pub struct RGMWindow {
 	pub MinHeight: Option<f64>,
 	pub MaxWidth: Option<f64>,
 	pub MaxHeight: Option<f64>,
+	pub BackgroundColor: Option<[f32; 4]>,
 
 	created_at: i64,
 	completed_at: Option<i64>
@@ -127,6 +128,9 @@ impl RGMWindow {
 	pub fn GetMaxHeight(&self) -> Option<f64> {
 		return self.MaxHeight;
 	}
+	pub fn GetBackgroundColor(&self) -> Option<[f32; 4]> {
+		return self.BackgroundColor;
+	}
 
 
 	// Mutable access.
@@ -156,6 +160,9 @@ impl RGMWindow {
 	}
 	pub fn SetMaxHeight(&mut self, MaxHeight: Option<f64>) {
 		self.MaxHeight = MaxHeight;
+	}
+	pub fn SetBackgroundColor(&mut self, BackgroundColor: Option<[f32; 4]>) {
+		self.BackgroundColor = BackgroundColor;
 	}
 
 	pub fn created_at(&self) -> Tm {
@@ -276,7 +283,7 @@ pub struct RGMText {
 	pub size: f32,
 	pub color: [f32; 4],
 	pub text: String,
-
+	pub hidden: bool,
 }
 #[allow(unused)]
 impl RGMText {
@@ -287,6 +294,7 @@ impl RGMText {
 		let size = 10.0;
 		let color = [1.0, 1.0, 1.0, 1.0];
 		let text = String::from("init");
+		let hidden = false;
 
 		let mut this = Self {
 			x,
@@ -294,12 +302,13 @@ impl RGMText {
 			size,
 			color,
 			text,
+			hidden,
 		};
 
 		this
 	}
 
-	pub fn initialize(x: f32, y: f32, size: f32, color: [f32; 4], text: String) -> Self {
+	pub fn initialize(x: f32, y: f32, size: f32, color: [f32; 4], text: String, hidden: bool) -> Self {
 
 		let mut this = Self {
 			x,
@@ -307,6 +316,7 @@ impl RGMText {
 			size,
 			color,
 			text,
+			hidden,
 		};
 
 		this
@@ -380,7 +390,7 @@ impl RGMinstance {
 	pub fn Setqueues(&mut self, queues: Option<vulkano::device::QueuesIter>) {
 		self.queues = queues;
 	}
-	pub fn AddText(RGMinst: RGMinstance, x: f32, y: f32, size: f32, color: [f32; 4], text: String)-> Self {
+	pub fn AddText(RGMinst: RGMinstance, x: f32, y: f32, size: f32, color: [f32; 4], text: String, hidden: bool)-> Self {
 		let Window = RGMinst.Window;
 		let Requirements = RGMinst.Requirements;
 
@@ -389,7 +399,7 @@ impl RGMinstance {
 		let device = RGMinst.device;
 		let mut Text = RGMinst.Text;
 
-		Text.push( RGMText::initialize(x, y, size, color, text) );
+		Text.push( RGMText::initialize(x, y, size, color, text, hidden) );
 
 		let mut this = Self {
 			Window,

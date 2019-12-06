@@ -21,6 +21,7 @@ fn main() {
 	RGMInstance.Window.SetMinHeight(	Some( 200.0 )	);
 	RGMInstance.Window.SetMaxWidth(		Some( 1024.0 )	);
 	RGMInstance.Window.SetMaxHeight(	Some( 768.0 )	);
+	RGMInstance.Window.SetBackgroundColor(	Some( [0.0, 0.0, 0.0, 1.0] )	);
 	RGMInstance.Window.created_at();
 
 	//Despues de modificar los valores por defecto(no es requerido modificarlos) inicializamos nuestra instancia
@@ -32,8 +33,9 @@ fn main() {
 	RGMInstance = RustyGuiMaker::ADDFigRustyInstance(RGMInstance, Structs::Vertex::Figures::Triangle, 0.1, 0.5, 0.0, "YELLOW".to_string(), Structs::Callbacks::CallbackEmun::DEL, String::from("Trian1"));
 
 
-	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "asd".to_string());
-	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], String::from("Hello world!"));
+	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "asd".to_string(), false);
+	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], String::from("Hello world!"), false);
+
 
 	//figura cstm1
 	let mut CSTMVert = Vec::new();

@@ -457,10 +457,10 @@ pub fn ADDCSTMFigRustyInstance(mut RGMinst : Structs::RGMinstance, lcVertexBase:
 }
 
 
-pub fn ADDTextRustyInstance(mut RGMinst : Structs::RGMinstance, x: f32, y: f32, size: f32, color: [f32; 4], text: String )-> Structs::RGMinstance{
+pub fn ADDTextRustyInstance(mut RGMinst : Structs::RGMinstance, x: f32, y: f32, size: f32, color: [f32; 4], text: String, hidden: bool)-> Structs::RGMinstance{
 
 	//RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::addFigure(RGMinst.CanvasFigures, Fig, RGMinst.device.clone().unwrap().clone(), Multiplier, XMovement, YMovement,Color, func, key);
-	RGMinst = Structs::RGMinstance::AddText(RGMinst, x, y, size, color, text);
+	RGMinst = Structs::RGMinstance::AddText(RGMinst, x, y, size, color, text, hidden);
 
 	return RGMinst;
 }
@@ -645,7 +645,9 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 			// }
 
 			for (i, obj) in RGMinst.Text.iter().enumerate() {
-				draw_text.queue_text( obj.x, obj.y, obj.size, obj.color, &obj.text);
+				if !obj.hidden {
+					draw_text.queue_text( obj.x, obj.y, obj.size, obj.color, &obj.text);
+				}
 				//println!(" ASDASDSA: {:?}", obj);
 			}
 			//draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], TextTest);
@@ -653,7 +655,6 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 			// draw_text.queue_text(x, 350.0, 70.0, [0.51, 0.6, 0.74, 1.0], "Ichi: ( ͡° ͜ʖ ͡°)");
 			// draw_text.queue_text(50.0, 350.0, 70.0, [1.0, 1.0, 1.0, 1.0], "Overlappp");
 			// SPECIFY TEXT TO DRAW END
-
 
 			let (image_num, acquire_future) = match swapchain::acquire_next_image(swapchain.clone(), None) {
 				Ok(r) => r,
@@ -668,7 +669,8 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 			//let clear_values = vec!([1.0, 1.0, 1.0, 1.0].into());
 
 			// Specify the color to clear the framebuffer with i.e. blue
-			let clear_values = vec![[0.0, 0.0, 0.0, 1.0].into(), 1f32.into()];
+			// let clear_values = vec![[0.0, 0.0, 0.0, 1.0].into(), 1f32.into()];
+			let clear_values = vec![RGMinst.Window.BackgroundColor.unwrap().into(), 1f32.into()];
 
 			let mut command_buffer_builder =
 				AutoCommandBufferBuilder::primary_one_time_submit(RGMinst.device.clone().unwrap().clone(), queue.family()).unwrap()
@@ -694,16 +696,24 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 						if clicked_idx == i {
 							println!("Le picaste a {}", clicked_idx);
 
+							//p.process_events( RGMinst.CanvasFigures.callback[clicked_idx].clone() );
+							//let funcionstr = Structs::Callbacks::CallbackEmun::as_str( &RGMinst.CanvasFigures.callback[clicked_idx].clone());
+
+
 							if clicked_idx == 0{
-								// println!("00000000000000000 {:?}", CanvasFigures.callback[clicked_idx]);
-								// let lol =  CanvasFigures.callback[clicked_idx].clone();
-								// p.process_events( CanvasFigures.callback[clicked_idx].clone() );
-								// let funcionstr =  Structs::Callbacks::CallbackEmun::as_str( &CanvasFigures.callback[clicked_idx].clone());
-								p.process_events( Structs::Callbacks::CallbackEmun::ADD );
+								// println!("00000000000000000 {:?}", RGMinst.CanvasFigures.callback[clicked_idx]);
+								// let lol =  RGMinst.CanvasFigures.callback[clicked_idx].clone();
+								// p.process_events( RGMinst.CanvasFigures.callback[clicked_idx].clone() );
+								// // let funcionstr = Structs::Callbacks::CallbackEmun::as_str( &RGMinst.CanvasFigures.callback[clicked_idx].clone());
+
+								// //este es el error
+								//p.process_events( Structs::Callbacks::CallbackEmun::ADD );
 							}
 							else if clicked_idx == 1{
 								// println!("1111111111111111 {:?}", CanvasFigures.callback[clicked_idx]);
-								p.process_events( Structs::Callbacks::CallbackEmun::DEL );
+
+								//este es el error
+								//p.process_events( Structs::Callbacks::CallbackEmun::DEL );
 							}
 
 							clicked_entity = None;

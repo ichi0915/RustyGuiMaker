@@ -61,6 +61,12 @@ impl Color {
 		else if Name.eq("WHITE"){
 			return [1.0, 1.0, 1.0];
 		}
+		else if Name.eq("KHAKI"){
+			return [0.76, 0.69, 0.57];
+		}
+		else if Name.eq("LIGHT-PINK"){
+			return [1.0, 0.70, 0.73];
+		}
 		else{
 			//white
 			return [1.0, 1.0, 1.0];

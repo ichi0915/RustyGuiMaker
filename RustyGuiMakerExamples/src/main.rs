@@ -137,8 +137,8 @@ pub fn EjemploTexto(){
 	RGMInstance = RustyGuiMaker::StartRustyInstance(RGMInstance);
 
 	//Ya creada e inicializada podemos empezar a anadir texto
-	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "Texto de prueba".to_string());
-	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], String::from("Hello world!"));
+	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "Texto de prueba".to_string(), false);
+	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], String::from("Hello world!"), false);
 
 	//una vez creadas las figuras corremos nuestra ventana
 	RustyGuiMaker::UseRustyInstance(RGMInstance);
