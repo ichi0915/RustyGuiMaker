@@ -457,19 +457,16 @@ pub fn ADDCSTMFigRustyInstance(mut RGMinst : Structs::RGMinstance, lcVertexBase:
 }
 
 
+pub fn ADDTextRustyInstance(mut RGMinst : Structs::RGMinstance, x: f32, y: f32, size: f32, color: [f32; 4], text: String )-> Structs::RGMinstance{
 
-pub fn SetText3(mut RGMinst: Structs::RGMinstance, Text: Option<vulkano_text::DrawText>) -> Structs::RGMinstance {
-
-	/*RGMinst.Window = RGMinst.Window;
-	RGMinst.Requirements = RGMinst.Requirements;
-
-	RGMinst.CanvasFigures = RGMinst.CanvasFigures;
-	RGMinst.queues = RGMinst.queues;
-	RGMinst.device = RGMinst.device;*/
-	RGMinst.Text = Text;
+	//RGMinst.CanvasFigures = Structs::Vertex::CanvasFigures::addFigure(RGMinst.CanvasFigures, Fig, RGMinst.device.clone().unwrap().clone(), Multiplier, XMovement, YMovement,Color, func, key);
+	RGMinst = Structs::RGMinstance::AddText(RGMinst, x, y, size, color, text);
 
 	return RGMinst;
 }
+
+
+
 
 
 //pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) -> Structs::RGMinstance {
@@ -527,8 +524,6 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 	//let mut draw_text = DrawText::new(RGMinst.device.clone().unwrap().clone(), queue.clone(), swapchain.clone(), &images);
 	//RGMinst.SetText( Some(draw_text) );
 	// RGMinst.SetText( Some(RGMinst, draw_text) );
-	//RGMinst = SetText3( RGMinst, Some(draw_text) );
-
 
 
 	let vs = Structs::Shaders::vs::Shader::load(RGMinst.device.clone().unwrap().clone()).unwrap();
@@ -649,7 +644,11 @@ pub fn UseRustyInstance(mut RGMinst : Structs::RGMinstance) {
 			//     x += 0.4;
 			// }
 
-			draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], TextTest);
+			for (i, obj) in RGMinst.Text.iter().enumerate() {
+				draw_text.queue_text( obj.x, obj.y, obj.size, obj.color, &obj.text);
+				//println!(" ASDASDSA: {:?}", obj);
+			}
+			//draw_text.queue_text(200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], TextTest);
 			// draw_text.queue_text(20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], "Hello world!");
 			// draw_text.queue_text(x, 350.0, 70.0, [0.51, 0.6, 0.74, 1.0], "Ichi: ( ͡° ͜ʖ ͡°)");
 			// draw_text.queue_text(50.0, 350.0, 70.0, [1.0, 1.0, 1.0, 1.0], "Overlappp");

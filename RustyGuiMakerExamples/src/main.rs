@@ -22,7 +22,8 @@ fn main() {
 		println!("\n\n\nSelecciona el ejemplo a correr:");
 		println!("\n1: Cuadrado");
 		println!("\n2: Custom Figure");
-		println!("\n3: Cuadrado en movimiento");
+		println!("\n3: Texto");
+		//println!("\n4: Cuadrado en movimiento");
 
 		let mut input_text = String::new();
 		io::stdin().read_line(&mut input_text).expect("Error leyendo del stdin");
@@ -34,7 +35,8 @@ fn main() {
 
 						1 => EjemploCuadrado(),
 						2 => EjemploCSTM(),
-						3 => EjemploCuadradoMove(),
+						3 => EjemploTexto(),
+						//4 => EjemploCuadradoMove(),
 
 						//ejemplos de rangos y multiples valores
 						44 | 55 | 66 => println!("Match several values"),
@@ -113,7 +115,38 @@ pub fn EjemploCSTM(){
 
 
 
+
+
+
 //3
+pub fn EjemploTexto(){
+	//Primero delcaramos nuestra instancia
+	let mut RGMInstance = Structs::RGMinstance::initialize();
+
+	//Una vez declarada podemos modificar los valores por defecto
+	RGMInstance.Window.SetWindowTitle(	Some( String::from("Rusty Gui maker Ejemplo Triangulo") ));
+	RGMInstance.Window.SetWidth(		Some( 800.0 )	);
+	RGMInstance.Window.SetHeight(		Some( 600.0 )	);
+	RGMInstance.Window.SetMinWidth(		Some( 400.0 )	);
+	RGMInstance.Window.SetMinHeight(	Some( 200.0 )	);
+	RGMInstance.Window.SetMaxWidth(		Some( 1024.0 )	);
+	RGMInstance.Window.SetMaxHeight(	Some( 768.0 )	);
+	RGMInstance.Window.created_at();
+
+	//Despues de modificar los valores por defecto(no es requerido modificarlos) inicializamos nuestra instancia
+	RGMInstance = RustyGuiMaker::StartRustyInstance(RGMInstance);
+
+	//Ya creada e inicializada podemos empezar a anadir texto
+	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "Texto de prueba".to_string());
+	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], String::from("Hello world!"));
+
+	//una vez creadas las figuras corremos nuestra ventana
+	RustyGuiMaker::UseRustyInstance(RGMInstance);
+}
+
+
+
+//4
 pub fn EjemploCuadradoMove(){
 	//Primero delcaramos nuestra instancia
 	let mut RGMInstance = Structs::RGMinstance::initialize();

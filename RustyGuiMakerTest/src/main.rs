@@ -29,7 +29,11 @@ fn main() {
 	//Ya creada e inicializada podemos empezar a anadir figuras
 	//En este ejemplo vamos a crear 2 figuras de nuestra base y 2 Customizadas
 	RGMInstance = RustyGuiMaker::ADDFigRustyInstance(RGMInstance, Structs::Vertex::Figures::Plane, 0.1, 0.0, 0.0, "RED".to_string(), Structs::Callbacks::CallbackEmun::ADD, String::from("Cuad1"));
-	RGMInstance = RustyGuiMaker::ADDFigRustyInstance(RGMInstance,Structs::Vertex::Figures::Triangle, 0.1, 0.5, 0.0, "YELLOW".to_string(), Structs::Callbacks::CallbackEmun::DEL, String::from("Trian1"));
+	RGMInstance = RustyGuiMaker::ADDFigRustyInstance(RGMInstance, Structs::Vertex::Figures::Triangle, 0.1, 0.5, 0.0, "YELLOW".to_string(), Structs::Callbacks::CallbackEmun::DEL, String::from("Trian1"));
+
+
+	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 200.0, 50.0, 20.0, [1.0, 1.0, 1.0, 1.0], "asd".to_string());
+	RGMInstance = RustyGuiMaker::ADDTextRustyInstance(RGMInstance, 20.0, 200.0, 190.0, [0.0, 1.0, 1.0, 1.0], String::from("Hello world!"));
 
 	//figura cstm1
 	let mut CSTMVert = Vec::new();

@@ -268,6 +268,52 @@ impl RGMinstanceORG {
 }
 
 
+#[allow(unused)]
+#[derive(Default, Debug, Clone, PartialEq)]
+pub struct RGMText {
+	pub x: f32,
+	pub y: f32,
+	pub size: f32,
+	pub color: [f32; 4],
+	pub text: String,
+
+}
+#[allow(unused)]
+impl RGMText {
+	pub fn initializeDefault() -> Self {
+
+		let x = 500.0;
+		let y = 500.0;
+		let size = 10.0;
+		let color = [1.0, 1.0, 1.0, 1.0];
+		let text = String::from("init");
+
+		let mut this = Self {
+			x,
+			y,
+			size,
+			color,
+			text,
+		};
+
+		this
+	}
+
+	pub fn initialize(x: f32, y: f32, size: f32, color: [f32; 4], text: String) -> Self {
+
+		let mut this = Self {
+			x,
+			y,
+			size,
+			color,
+			text,
+		};
+
+		this
+	}
+}
+
+
 
 #[allow(unused)]
 //#[derive(Clone)]
@@ -278,8 +324,8 @@ pub struct RGMinstance {
 	pub CanvasFigures: Vertex::CanvasFigures,
 	pub queues: Option<vulkano::device::QueuesIter>,
 	pub device: Option<std::sync::Arc<vulkano::device::Device>>,
-	pub Text: Option<vulkano_text::DrawText>
-
+	pub Text: Vec<RGMText>
+	//pub Text: Option<vulkano_text::DrawText>
 }
 
 #[allow(unused)]
@@ -292,7 +338,7 @@ impl RGMinstance {
 		let CanvasFigures = Vertex::CanvasFigures::createCanvasFigures();
 		let queues = None;
 		let device = None;
-		let Text = None;
+		let Text = Vec::new();
 
 		let mut this = Self {
 			Window,
@@ -334,11 +380,30 @@ impl RGMinstance {
 	pub fn Setqueues(&mut self, queues: Option<vulkano::device::QueuesIter>) {
 		self.queues = queues;
 	}
-	pub fn SetText(&mut self, Text: Option<vulkano_text::DrawText>) {
-		self.Text = Text;
+	pub fn AddText(RGMinst: RGMinstance, x: f32, y: f32, size: f32, color: [f32; 4], text: String)-> Self {
+		let Window = RGMinst.Window;
+		let Requirements = RGMinst.Requirements;
+
+		let CanvasFigures = RGMinst.CanvasFigures;
+		let queues = RGMinst.queues;
+		let device = RGMinst.device;
+		let mut Text = RGMinst.Text;
+
+		Text.push( RGMText::initialize(x, y, size, color, text) );
+
+		let mut this = Self {
+			Window,
+			Requirements,
+			queues,
+			device,
+			CanvasFigures,
+			Text,
+		};
+
+		this
 	}
 
-	pub fn SetText2(&mut self, RGMinst: RGMinstance, Text: Option<vulkano_text::DrawText>) -> Self {
+	/*pub fn SetText2(&mut self, RGMinst: RGMinstance, Text: Option<vulkano_text::DrawText>) -> Self {
 
 		let Window = RGMinst.Window;
 		let Requirements = RGMinst.Requirements;
@@ -358,7 +423,7 @@ impl RGMinstance {
 		};
 
 		this
-	}
+	}*/
 	pub fn Setsurface(&mut self, surface: RGMRequirements ) {
 		//self.queues = queues;
 	}
